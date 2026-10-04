@@ -1,0 +1,29 @@
+name: wireless
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  actors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: sudo apt-get update && sudo apt-get install -y sbcl cl-bordeaux-threads
+      - run: python3 -m pip install -e .
+      - run: python3 scripts/prepare-starlang.py
+      - run: python3 scripts/build-views.py --check
+      - run: node tests/views.js
+      - run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Real native actor proof
+        env:
+          STARLANG_SOURCE: ${{ github.workspace }}/.cache/star-lang
+          CL_SOURCE_REGISTRY: '${{ github.workspace }}//:${{ github.workspace }}/.cache/star-lang//:/usr/share/common-lisp/source//:'
+        run: sbcl --script scripts/native-proof.lisp
+      - run: python3 scripts/live-couchdb-proof.py

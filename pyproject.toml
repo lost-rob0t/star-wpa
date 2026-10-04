@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "star-wpa"
+version = "0.1.0"
+description = "StarLang wireless actors consuming StarIntel 0.10.1"
+requires-python = ">=3.11"
+dependencies = ["jsonschema>=4.18,<5"]
+
+[project.scripts]
+star-wpa = "star_wpa.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["star_wpa*"]
+
+[tool.setuptools.package-data]
+star_wpa = ["_release/*.json", "_release/*.star", "_release/*.py", "_release/generated/*"]

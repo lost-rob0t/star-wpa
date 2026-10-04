@@ -1,0 +1,1 @@
+{"dataset":"lab","receiverId":"receiver-1","observations":[{"bssid":"aa:bb:cc:dd:ee:ff","observedAt":123,"latitude":0,"longitude":0,"distanceMeters":10,"signalDbm":-50}]}
