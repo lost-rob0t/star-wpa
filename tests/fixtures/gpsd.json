@@ -1,0 +1,13 @@
+{
+  "dataset": "lab",
+  "receiverId": "gps1",
+  "reports": [
+    {
+      "class": "TPV",
+      "mode": 3,
+      "lat": 0,
+      "lon": 0,
+      "time": "2026-01-01T00:00:00Z"
+    }
+  ]
+}

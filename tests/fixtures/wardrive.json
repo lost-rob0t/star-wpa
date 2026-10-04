@@ -1,0 +1,15 @@
+{
+  "dataset": "lab",
+  "device_id": "installation-1",
+  "observations": [
+    {
+      "id": 1,
+      "address": "aa:bb:cc:dd:ee:ff",
+      "time": 1700000000123,
+      "radio": "WIFI",
+      "latitude": 0,
+      "longitude": 0,
+      "level": -50
+    }
+  ]
+}

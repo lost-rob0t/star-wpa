@@ -1,0 +1,73 @@
+:PROPERTIES:
+:ID: star-wpa-wireless-package-0101
+:END:
+#+title: Wireless actor package for StarIntel 0.10.1
+#+description: StarLang actors with external adapters, canonical geo relations and multi receiver trilateration.
+#+status: IMPLEMENTED
+#+filetags: :rage:design:wireless:
+
+* Approval Table
+
+| Approval area | Required authority | State | Evidence required | Evidence reference |
+|---------------+--------------------+-------+-------------------+--------------------|
+| Implementation | Project owner | APPROVED | Explicit task instruction | User requested migration and the actors, views, relations, geo and 0.10.1 StarLang support in this session. |
+| Production deployment | Project owner | NOT APPLICABLE | No deployment requested | This change delivers a review branch only. |
+
+* Verified Facts
+
+- star-wpa is a RAGE template with no actor code at baseline.
+- Current GitHub starintel-server contains legacy wireless CouchDB views, but its lock targets release 0.9.1 over schema 0.9.0.
+- No wireless actors were found in current GitHub server, pro-actors or edge checkouts. Source repository clarification remains outstanding.
+- StarLang core.star owns the 0.10.1 wireless-network, wireless-station, geo-point, location and relation contracts.
+
+* Design
+
+Compile .star actor declarations using the maintained compiler and execute using the Common Lisp native runtime. Python owns external Kismet HTTP, GPSD TCP and exact argv tool adapters, normalization and numerical solving. Consume the complete immutable StarLang release via its existing sync script. Emit canonical event evidence, wireless records, geo-point/location and explicit relations. Receiver position is observation geography, never an inferred AP position. Trilateration joins at least three distinct receivers for the same dataset, transmitter and bounded time window; reject degenerate geometry and retain residuals and source evidence.
+
+CouchDB map views expose observation joins, geo and relations. Numerical trilateration runs in the resolver actor, outside reduce: views index evidence and do not fabricate a CouchDB spatial engine. Active effects use bounded subprocess deadlines and explicit target-scoped local policy.
+
+* Unresolved Questions
+
+Original actor source is unknown; do not claim old source was moved or delete unrelated upstream code. Physical radio and live service testing are separate from fixture/runtime tests.
+
+* Changelog
+
+| Date | Change | Author or actor | Evidence |
+|------+--------+-----------------+----------|
+| 2026-10-04 | Approved implementation from explicit user instruction | Codex | Session request and inspected sources |
+
+* IMPLEMENTED RAGE Execution Record
+:PROPERTIES:
+:STATUS_EVENT_ID: 24ec8adc-b5cb-44f0-bd93-b8d460cc0108
+:RECORDED_AT: 2026-10-04T17:40:21+00:00
+:END:
+
+** Summary
+Implemented seven native StarLang wireless actors, canonical 0.10.1 adapters, geo relations, scoped effects and tested CouchDB multilateration views.
+
+** Files
+- actors
+- lisp
+- star_wpa
+- views
+- schema/starintel-schema.lock.json
+
+** Tests
+- python3 -m unittest discover -s tests -p test_*.py -v: 23 passed
+- node tests/views.js: STAR-WPA-VIEWS-OK
+- sbcl --script scripts/native-proof.lisp: STAR-WPA-NATIVE-PROOF-OK using extracted SBCL 2.5.2 and locked StarLang checkout
+- python3 scripts/live-couchdb-proof.py: STAR-WPA-LIVE-COUCHDB-PROOF-OK
+
+** Commits
+- None
+
+** Notes
+- No physical radio, GPS hardware or deployed Kismet test was run. Original actor source clarification and coordinated server cleanup remain unresolved; server PR311 is intact.
+
+* Final Verification
+
+- 2026-10-04: 24 Python tests pass after adding payload bounds and the current Kismet SSID field fallback.
+- Native proof exercises actual listener, GPSD, Kismet and wardrive handlers, plus denied deauthentication; all seven declarations compile and register.
+- Disposable CouchDB proof verifies generated JavaScript through the real CouchDB view engine, replay, bounded queries, hydrated four-receiver solve and derived geo writes.
+- Existing server authority remains at ce14c77ccd2f51f543410fdeef3d78fb9978b769; inspected wireless PR311 head is 8c74bf3e22146479814f1eb33582df7b2cf0c388. Conversion was extracted, but neither upstream branch was altered.
+- The Python wheel build succeeds and contains all 18 files of the locked canonical release. The Lisp runtime is consumed from the exact separate StarLang checkout.
