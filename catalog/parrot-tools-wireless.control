@@ -1,0 +1,38 @@
+Package: parrot-tools-wireless
+Architecture: any
+Recommends:
+ aircrack-ng [!i386],
+ airgeddon,
+ asleap [!i386 !riscv64],
+ bluelog,
+ blueranger,
+ bluesnarfer,
+ bluez-hcidump [!i386],
+ btscanner [!i386],
+ bully [!i386],
+ cowpatty [!i386],
+ crackle [!i386 !riscv64],
+ eapmd5pass [!i386 !riscv64],
+ fern-wifi-cracker,
+ hackrf [!i386],
+ inspectrum [!i386],
+ king-phisher,
+ libfreefare-bin [!i386],
+ libnfc-bin [!i386],
+ mdk3 [!i386],
+ mfcuk [!i386],
+ mfoc [!i386],
+ mfterm [!i386 !riscv64],
+ pixiewps [!i386],
+ reaver [!i386],
+ redfang [!i386 !riscv64],
+ rfcat [!i386 !riscv64],
+ rtlsdr-scanner,
+ ubertooth [!i386],
+ wifi-honey,
+ wifite,
+ yersinia,
+Section: metapackages
+Priority: optional
+Description: Pentest tools for wireless exploitation
+  A collection of tools used for wireless audits, attacks and exploits.

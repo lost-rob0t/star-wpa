@@ -1,0 +1,461 @@
+{
+  "catalogVersion": 1,
+  "source": {
+    "repository": "ParrotSec/parrot-tools",
+    "commit": "a5c278bc04319cf8b0b9e377edd7a46084e63f87",
+    "path": "debian/control",
+    "sha256": "f1b203e0fe8ff05211d879dabb8a425fb6c4108e53c7c113798731612c2efc2b",
+    "stanzaSha256": "2d39f2195a32d5dc1c4dd2fef918a9641b532092f2ac5f694863f95bc0ce7b22",
+    "retrievedAt": "2026-10-04",
+    "metapackage": "parrot-tools-wireless"
+  },
+  "packages": [
+    {
+      "package": "aircrack-ng",
+      "family": "wifi",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "airgeddon",
+      "family": "wifi",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "asleap",
+      "family": "wifi",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386",
+        "!riscv64"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "bettercap",
+      "family": "network",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "bluelog",
+      "family": "bluetooth",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "blueranger",
+      "family": "bluetooth",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "bluesnarfer",
+      "family": "bluetooth",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "bluez",
+      "family": "bluetooth",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "bluez-hcidump",
+      "family": "bluetooth",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "btscanner",
+      "family": "bluetooth",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "bully",
+      "family": "wifi",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "cowpatty",
+      "family": "wifi",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "crackle",
+      "family": "bluetooth",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386",
+        "!riscv64"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "eaphammer",
+      "family": "wifi",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "eapmd5pass",
+      "family": "wifi",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386",
+        "!riscv64"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "fern-wifi-cracker",
+      "family": "wifi",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [],
+      "ui": "desktop"
+    },
+    {
+      "package": "gnuradio",
+      "family": "sdr",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "gpsd",
+      "family": "wifi",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "gqrx-sdr",
+      "family": "sdr",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "desktop"
+    },
+    {
+      "package": "gr-gsm",
+      "family": "sdr",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "gr-osmosdr",
+      "family": "sdr",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "hackrf",
+      "family": "sdr",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "hcxdumptool",
+      "family": "wifi",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "hcxtools",
+      "family": "wifi",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "hostapd",
+      "family": "wifi",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "hostapd-wpe",
+      "family": "wifi",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "inspectrum",
+      "family": "sdr",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "desktop"
+    },
+    {
+      "package": "iw",
+      "family": "wifi",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "king-phisher",
+      "family": "network",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [],
+      "ui": "desktop"
+    },
+    {
+      "package": "kismet",
+      "family": "wifi",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "libfreefare-bin",
+      "family": "nfc-rfid",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "libnfc-bin",
+      "family": "nfc-rfid",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "mdk3",
+      "family": "wifi",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "mdk4",
+      "family": "wifi",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "mfcuk",
+      "family": "nfc-rfid",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "mfoc",
+      "family": "nfc-rfid",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "mfterm",
+      "family": "nfc-rfid",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386",
+        "!riscv64"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "multimon-ng",
+      "family": "sdr",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "pixiewps",
+      "family": "wifi",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "reaver",
+      "family": "wifi",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "redfang",
+      "family": "bluetooth",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386",
+        "!riscv64"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "rfcat",
+      "family": "sdr",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386",
+        "!riscv64"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "rfkill",
+      "family": "wifi",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "rtl-433",
+      "family": "sdr",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "rtl-sdr",
+      "family": "sdr",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "rtlsdr-scanner",
+      "family": "sdr",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [],
+      "ui": "desktop"
+    },
+    {
+      "package": "soapysdr-tools",
+      "family": "sdr",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "tshark",
+      "family": "network",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "ubertooth",
+      "family": "bluetooth",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [
+        "!i386"
+      ],
+      "ui": "cli"
+    },
+    {
+      "package": "uhd-host",
+      "family": "sdr",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "wifi-honey",
+      "family": "wifi",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "wifiphisher",
+      "family": "wifi",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "wifite",
+      "family": "wifi",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "wireless-tools",
+      "family": "wifi",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "wireshark",
+      "family": "network",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "desktop"
+    },
+    {
+      "package": "wpasupplicant",
+      "family": "wifi",
+      "source": "supplemental",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    },
+    {
+      "package": "yersinia",
+      "family": "network",
+      "source": "parrot-tools-wireless",
+      "architectureRestrictions": [],
+      "ui": "cli"
+    }
+  ]
+}

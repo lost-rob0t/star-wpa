@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 from .contracts import validate_bundle
 
@@ -17,7 +18,7 @@ def run_once(actor, request, operation):
     os.close(fd)
     key = json.dumps([request['dataset'], actor, request['requestId']])
     fingerprint = hashlib.sha256(json.dumps(request, sort_keys=True, allow_nan=False).encode()).hexdigest()
-    with sqlite3.connect(target, timeout=5) as db:
+    with closing(sqlite3.connect(target, timeout=5)) as db:
         db.execute('CREATE TABLE IF NOT EXISTS effects (identity TEXT PRIMARY KEY, fingerprint TEXT NOT NULL, status TEXT NOT NULL, receipt TEXT)')
         db.execute('BEGIN IMMEDIATE')
         row = db.execute('SELECT fingerprint, status, receipt FROM effects WHERE identity=?', (key,)).fetchone()

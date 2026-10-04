@@ -150,6 +150,9 @@ def dispatch(actor, request, policy=None):
         raise ValueError("request must be a JSON object")
     # Validate the dataset before any external effect.
     document("event", request["dataset"], "wpa:preflight")
+    if actor.startswith("tool-"):
+        from .tools import dispatch_tool
+        return dispatch_tool(actor[5:], request, policy)
     operation = request.get("operation", "ingest")
     if actor == "kismet":
         if operation == "collect":

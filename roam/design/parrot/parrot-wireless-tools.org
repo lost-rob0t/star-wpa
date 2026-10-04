@@ -1,0 +1,68 @@
+:PROPERTIES:
+:ID: star-wpa-parrot-wireless-tools
+:END:
+#+title: Parrot wireless tool actors
+#+description: Complete pinned Parrot wireless metapackage coverage with executable ownership discovery and bounded invocation.
+#+status: IMPLEMENTED
+#+filetags: :rage:design:parrot:wireless:
+
+* Approval Table
+
+| Approval area | Required authority | State | Evidence required | Evidence reference |
+|---------------+--------------------+-------+-------------------+--------------------|
+| Implementation and merge | Project owner | APPROVED | Explicit user instruction | User: Merge on green and expand it to support every wireless tool in parrot os. |
+| Physical device effects | Local operator | NOT APPLICABLE | No hardware execution in this change | Tests replace external effect ports or use local fixtures. Deployed executions require local exact-command policy. |
+
+* Verified Facts
+
+- PR1 is green and merged at 81c5c81cd25174d71d322922941c7eaae956cd7d.
+- ParrotSec/parrot-tools commit a5c278bc04319cf8b0b9e377edd7a46084e63f87 recommends 31 packages under parrot-tools-wireless. Architecture restrictions are retained.
+- This list includes desktop/interactive tools and the non-radio king-phisher package; do not silently exclude source-listed packages.
+
+* Design
+
+Maintain an immutable upstream stanza plus hash and a catalog containing every listed package. Add 26 adjacent wireless utilities as explicit supplemental entries, never silently label them upstream membership. Generate per-package .star actor declarations from this source and execute them on the same maintained runtime.
+
+Discover installed package executables with dpkg-query, verify real ownership and resolve exact basenames. Provide discover and execute operations, stdin and terminal/desktop requirements, bounded subprocess groups, output byte limits, redacted hash/length receipts and existing at-most-once admission. Every execute argv, working directory, stdin file and UI mode must exactly match deployment-local approved command descriptors. The request cannot authorize itself.
+
+This is full package-level discovery/invocation coverage, not a claim that every flag/output format or radio device is semantically normalized or hardware-tested. Specialized Kismet/GPSD/airodump/wardrive parsers remain the canonical radio observation adapters.
+
+User subsequently requested evil-twin/phishing tool adapters and Nix flakes. Supplemental entries include Wifiphisher, EAPHammer and hostapd-wpe. Flakes pin nixpkgs, StarLang and Parrot sources; Python adapters, native runtime launcher, checks, development shell and an availability-labelled nixpkgs tool bundle are build outputs. Missing packages require an explicit operator-pinned installation; no substitute program is represented as the missing tool.
+
+* Evaluation Gates
+
+Prove source coverage equality, no missing generated declarations, each entry can traverse discovery and execution ports under policy, rejection of unowned binaries, missing packages/desktop, denial before effects, bounded timeout/output cleanup, native runtime registration and actual process execution. Run all existing schema/view/CouchDB and research gates plus CI before merging.
+
+* Changelog
+
+| Date | Change | Author or actor | Evidence |
+|------+--------+-----------------+----------|
+| 2026-10-04 | Approved scope from explicit user request | Codex | Session and pinned upstream control |
+
+* IMPLEMENTED RAGE Execution Record
+:PROPERTIES:
+:STATUS_EVENT_ID: 4e87f10d-01c9-4110-8903-d6d0399099a0
+:RECORDED_AT: 2026-10-04T18:17:09+00:00
+:END:
+
+** Summary
+Added 57 package tool actors covering all 31 pinned Parrot wireless packages, supplemental evil-twin tools, exact-command policy and a pinned Nix flake.
+
+** Files
+- star_wpa/tools.py
+- star_wpa/tool_catalog.json
+- actors/tools
+- flake.nix
+- flake.lock
+
+** Tests
+- Python tool-port tests: 9 pass including real subprocess timeout, overflow, PTY and pinned-source invocation
+- scripts/native-tool-proof.py: actual StarLang runtime registers 64 actors and executes a substituted external-tool fixture
+- build-tool-actors.py --check --source /workspace/parrot-tools: 31 upstream packages and 57 generated actor declarations verified
+- lock-runtime-source.py --check: 80 exact upstream runtime source files verified
+
+** Commits
+- None
+
+** Notes
+- Nix flake evaluation passed for x86_64-linux; full builds and CI still to be run before merge. Tool/hardware-specific workflows remain untested.

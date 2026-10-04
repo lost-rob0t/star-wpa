@@ -12,7 +12,20 @@ Wireless actors for StarIntel **0.10.1**, consuming the immutable release genera
 | `wpa-trilateration` | Independent receiver multilateration, explicit calibrated RSSI conversion |
 | `wpa-wardrive` | WarStar/WiGLE Wi-Fi and Bluetooth observation exports, extracted from server PR #311 |
 
+The Parrot extension adds **57 package tool actors**, covering all 31 packages in the pinned Parrot wireless metapackage plus supplemental Wi-Fi/Bluetooth/NFC/SDR tools, including Wifiphisher and EAPHammer. See [coverage and invocation contracts](docs/PARROT-TOOLS.md).
+
 ## Install and validate
+
+Nix is the reproducible build path:
+
+```sh
+nix develop
+nix flake check -L
+nix run . -- listener --request tests/fixtures/listener.json
+nix run .#native -- listener "$PWD/tests/fixtures/listener.json"
+```
+
+The following direct host setup is also supported:
 
 Requires Python 3.11+, SBCL, Bordeaux Threads and Node.js for view tests. On Debian/Ubuntu install `sbcl cl-bordeaux-threads`. Radio tools and GPSD/Kismet are required only for their live effects.
 
@@ -27,7 +40,7 @@ node tests/views.js
 sbcl --script scripts/native-proof.lisp
 ```
 
-The runtime refuses a substituted or dirty StarLang checkout. Schema and runtime share the exact commit in `schema/starintel-schema.lock.json`; the vendored release is copied and checked by the upstream consumer sync tool. Never edit generated contracts locally.
+The runtime verifies exact source hashes for either a pinned Git checkout or an immutable Nix source export; dirty Git checkouts are rejected. Schema and runtime share the exact commit in `schema/starintel-schema.lock.json`; the vendored release is copied and checked by the upstream consumer sync tool. Never edit generated contracts locally.
 
 ## Use the actors
 
