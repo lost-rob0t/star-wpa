@@ -1,2 +1,3 @@
 star_wpa/_release/** linguist-generated=true
 views/wireless.json linguist-generated=true
+actors/tools/** linguist-generated=true

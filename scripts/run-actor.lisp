@@ -1,0 +1,10 @@
+(require :asdf)
+(setf *compile-verbose* nil *load-verbose* nil)
+(asdf:load-system "star-wpa")
+(let ((arguments (uiop:command-line-arguments)))
+  (unless (= 2 (length arguments))
+    (error "Usage: star-wpa-native CAPABILITY ABSOLUTE-REQUEST-FILE"))
+  (let ((runtime (star-wpa:start-wireless-runtime)))
+    (unwind-protect
+         (write-string (star-wpa:dispatch runtime (first arguments) (second arguments)))
+      (starlangruntime:shutdown-runtime runtime))))

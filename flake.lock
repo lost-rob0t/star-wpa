@@ -1,0 +1,63 @@
+{
+  "nodes": {
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1786862985,
+        "narHash": "sha256-FBJRXmbGXiSUDvYEbfLYRkckayyZ6SK1UEqhCrIZ2Cs=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "e5bdc4a41d4c072fe1e3787eaa0320a384741d44",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "e5bdc4a41d4c072fe1e3787eaa0320a384741d44",
+        "type": "github"
+      }
+    },
+    "parrot-tools": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1777395095,
+        "narHash": "sha256-vkep+Ggu3gziFrsOMflcFscvtHsDAQ2zvzDtQB9tqZk=",
+        "owner": "ParrotSec",
+        "repo": "parrot-tools",
+        "rev": "a5c278bc04319cf8b0b9e377edd7a46084e63f87",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ParrotSec",
+        "repo": "parrot-tools",
+        "rev": "a5c278bc04319cf8b0b9e377edd7a46084e63f87",
+        "type": "github"
+      }
+    },
+    "root": {
+      "inputs": {
+        "nixpkgs": "nixpkgs",
+        "parrot-tools": "parrot-tools",
+        "star-lang": "star-lang"
+      }
+    },
+    "star-lang": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1791129158,
+        "narHash": "sha256-PSu2t5IO3HdrlUvUfPr5B4b5QiYcOOeEXpX0Sl2XDjY=",
+        "owner": "lost-rob0t",
+        "repo": "star-lang",
+        "rev": "e9ec1d883627d186aafe0b3647bdc29baea03543",
+        "type": "github"
+      },
+      "original": {
+        "owner": "lost-rob0t",
+        "repo": "star-lang",
+        "rev": "e9ec1d883627d186aafe0b3647bdc29baea03543",
+        "type": "github"
+      }
+    }
+  },
+  "root": "root",
+  "version": 7
+}

@@ -33,11 +33,20 @@
     (uiop:run-program
      (list *python-executable* (namestring (merge-pathnames "scripts/check-runtime-pin.py" root)))
      :output :string :error-output :string)
+    (uiop:run-program
+     (list *python-executable* (namestring (merge-pathnames "scripts/build-tool-actors.py" root)) "--check")
+     :output :string :error-output :string)
     (handler-case
         (progn
-          (dolist (capability '("kismet" "gpsd" "listener" "aircrack" "deauth" "trilateration" "wardrive"))
-            (let* ((ir (starlangcompiler:compile-actor-file
-                        (merge-pathnames (format nil "actors/~A.star" capability) root)))
+          (dolist (source
+                    (append (mapcar (lambda (name) (merge-pathnames (format nil "actors/~A.star" name) root))
+                                    '("kismet" "gpsd" "listener" "aircrack" "deauth" "trilateration" "wardrive"))
+                            (sort (directory (merge-pathnames "actors/tools/*.star" root))
+                                  #'string< :key #'namestring)))
+            (let* ((capability (if (search "/tools/" (namestring source))
+                                   (format nil "tool-~A" (pathname-name source))
+                                   (pathname-name source)))
+                   (ir (starlangcompiler:compile-actor-file source))
                    (expected-handler (format nil "wpa-~A-handler" capability)))
               (unless (string= expected-handler (getf ir :handler))
                 (error "Unbound wireless handler in compiled declaration."))

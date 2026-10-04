@@ -5,6 +5,7 @@ import os
 import sys
 from pathlib import Path
 from .adapters import MAX_BYTES, dispatch
+from .tools import CATALOG
 
 
 def load_json(path):
@@ -17,7 +18,7 @@ def load_json(path):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("actor", choices=["kismet", "gpsd", "listener", "aircrack", "deauth", "trilateration", "wardrive"])
+    parser.add_argument("actor", choices=["kismet", "gpsd", "listener", "aircrack", "deauth", "trilateration", "wardrive"] + ["tool-" + name for name in CATALOG])
     parser.add_argument("--request", required=True, help="operator-local request JSON file")
     args = parser.parse_args()
     try:

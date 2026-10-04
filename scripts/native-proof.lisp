@@ -10,7 +10,7 @@
        (runtime (star-wpa:start-wireless-runtime)))
   (unwind-protect
        (progn
-         (assert (= 7 (starlangruntime:runtime-actor-count runtime)))
+         (assert (= 64 (starlangruntime:runtime-actor-count runtime)))
          (let* ((request (namestring (merge-pathnames "tests/fixtures/listener.json" root)))
                 (first (star-wpa:dispatch runtime "listener" request))
                 (second (star-wpa:dispatch runtime "listener" request)))
@@ -25,6 +25,16 @@
                           (namestring (merge-pathnames (format nil "tests/fixtures/~A.json" capability) root)))))
              (assert (search "0.10.1" output))
              (assert (search "relation" output))))
+         (let ((output (star-wpa:dispatch runtime "tool-wifiphisher"
+                        (namestring (merge-pathnames "tests/fixtures/tool-discovery.json" root)))))
+           (assert (search "wireless-tool-discovery" output))
+           (assert (search "wifiphisher" output)))
+         (let ((request (uiop:getenv "STAR_WPA_NATIVE_TOOL_REQUEST")))
+           (when request
+             (let ((output (star-wpa:dispatch runtime "tool-wifiphisher" request)))
+               (assert (search "wireless-tool-execution" output))
+               (assert (search "stdoutBytes" output))
+               (assert (not (search "native-tool-port-fixture" output))))))
          ;; Failure crosses the real mailbox and process boundary, not a mock handler.
          (let ((failed nil))
            (handler-case
