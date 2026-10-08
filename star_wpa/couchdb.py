@@ -14,6 +14,15 @@ def canonical(stored):
     return {k: v for k, v in stored.items() if k not in ('_id', '_rev')}
 
 
+def document_path(identity):
+    # CouchDB reserves these routing prefixes. Encoding their separator causes
+    # a 301, which must not be followed by the credential-bearing HTTP port.
+    for prefix in ('_design/', '_local/'):
+        if identity.startswith(prefix):
+            return prefix + quote(identity[len(prefix):], safe='')
+    return quote(identity, safe='')
+
+
 class CouchDB:
     def __init__(self, url, *, user=None, password=None, timeout=30):
         parsed = urlparse(url)
@@ -53,7 +62,7 @@ class CouchDB:
 
     def get(self, identity):
         try:
-            return self.request('GET', quote(identity, safe=''))
+            return self.request('GET', document_path(identity))
         except HTTPError as error:
             if error.code == 404:
                 return None
@@ -69,7 +78,7 @@ class CouchDB:
                     return {'id': identity, 'unchanged': True}
                 value['_rev'] = current['_rev']
             try:
-                return self.request('PUT', quote(identity, safe=''), value)
+                return self.request('PUT', document_path(identity), value)
             except HTTPError as error:
                 if error.code != 409:
                     raise
@@ -108,7 +117,7 @@ class CouchDB:
                 if current:
                     stored['_rev'] = current['_rev']
                 try:
-                    results.append(self.request('PUT', quote(identity, safe=''), stored))
+                    results.append(self.request('PUT', document_path(identity), stored))
                     break
                 except HTTPError as error:
                     if error.code != 409:

@@ -15,6 +15,12 @@ from star_wpa.tools import MAX_OUTPUT, run_tool
 
 
 class HardeningTests(unittest.TestCase):
+    def test_couchdb_reserved_routes_are_canonical_without_unescaping_ids(self):
+        from star_wpa.couchdb import document_path
+        self.assertEqual(document_path('_design/wireless'), '_design/wireless')
+        self.assertEqual(document_path('_local/a/b'), '_local/a%2Fb')
+        self.assertEqual(document_path('ordinary/a?b'), 'ordinary%2Fa%3Fb')
+
     def test_http_redirects_never_forward_credentials_or_follow_location(self):
         seen = []
         class Handler(BaseHTTPRequestHandler):
