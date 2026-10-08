@@ -125,7 +125,7 @@ Station MAC, First time seen, Last time seen, Power, # packets, BSSID, Probed ES
             command("deauth", request, policy)
 
     def test_effect_failures_are_not_success(self):
-        with tempfile.TemporaryDirectory() as directory, patch.dict("os.environ", {"STAR_WPA_EFFECT_DB": directory + "/effects.sqlite"}), patch("star_wpa.adapters.subprocess.run", side_effect=subprocess.TimeoutExpired("aircrack-ng", 1)):
+        with tempfile.TemporaryDirectory() as directory, patch.dict("os.environ", {"STAR_WPA_EFFECT_DB": directory + "/effects.sqlite"}), patch("star_wpa.tools.run_tool", side_effect=subprocess.TimeoutExpired("aircrack-ng", 1)):
             with self.assertRaises(subprocess.TimeoutExpired):
                 dispatch("aircrack", {"dataset": "lab", "requestId": "effect-1", "capture": "/tmp/lab.cap", "wordlist": "/tmp/words",
                                       "bssid": "aa:bb:cc:dd:ee:ff"}, {"allowAircrack": True,

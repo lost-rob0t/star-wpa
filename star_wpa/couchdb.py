@@ -4,13 +4,23 @@ import json
 import os
 from urllib.error import HTTPError
 from urllib.parse import quote, urlencode, urlparse
-from urllib.request import Request, urlopen
+from urllib.request import Request
+from .http import open_http
 from .contracts import validate, validate_bundle
 from .adapters import MAX_BYTES
 
 
 def canonical(stored):
     return {k: v for k, v in stored.items() if k not in ('_id', '_rev')}
+
+
+def document_path(identity):
+    # CouchDB reserves these routing prefixes. Encoding their separator causes
+    # a 301, which must not be followed by the credential-bearing HTTP port.
+    for prefix in ('_design/', '_local/'):
+        if identity.startswith(prefix):
+            return prefix + quote(identity[len(prefix):], safe='')
+    return quote(identity, safe='')
 
 
 class CouchDB:
@@ -37,7 +47,7 @@ class CouchDB:
         if self.auth:
             headers['Authorization'] = self.auth
         data = json.dumps(body, allow_nan=False).encode() if body is not None else None
-        with urlopen(Request(url, data=data, headers=headers, method=method), timeout=self.timeout) as response:
+        with open_http(Request(url, data=data, headers=headers, method=method), timeout=self.timeout) as response:
             raw = response.read(MAX_BYTES + 1)
         if len(raw) > MAX_BYTES:
             raise ValueError('CouchDB response exceeds byte limit; use smaller query windows')
@@ -52,7 +62,7 @@ class CouchDB:
 
     def get(self, identity):
         try:
-            return self.request('GET', quote(identity, safe=''))
+            return self.request('GET', document_path(identity))
         except HTTPError as error:
             if error.code == 404:
                 return None
@@ -68,7 +78,7 @@ class CouchDB:
                     return {'id': identity, 'unchanged': True}
                 value['_rev'] = current['_rev']
             try:
-                return self.request('PUT', quote(identity, safe=''), value)
+                return self.request('PUT', document_path(identity), value)
             except HTTPError as error:
                 if error.code != 409:
                     raise
@@ -107,7 +117,7 @@ class CouchDB:
                 if current:
                     stored['_rev'] = current['_rev']
                 try:
-                    results.append(self.request('PUT', quote(identity, safe=''), stored))
+                    results.append(self.request('PUT', document_path(identity), stored))
                     break
                 except HTTPError as error:
                     if error.code != 409:

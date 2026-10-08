@@ -8,7 +8,8 @@ import subprocess
 import tempfile
 import time
 from pathlib import Path
-from urllib.request import Request, urlopen
+from urllib.request import Request
+from .http import open_http
 from urllib.parse import urlparse
 from .contracts import NS, document, stable_id, validate_bundle
 from .ingest import ingest_airodump, ingest_gpsd, ingest_kismet, ingest_wardrive, mac, observations
@@ -66,17 +67,22 @@ def command(actor, request, policy):
     return argv + [interface]
 
 
-def kismet_devices(request):
+def kismet_devices(request, policy=None):
     url = request["url"]
     parsed = urlparse(url)
-    if parsed.scheme not in ("http", "https") or not parsed.netloc or parsed.username or parsed.password:
+    if parsed.scheme not in ("http", "https") or not parsed.netloc or parsed.username or parsed.password or parsed.fragment:
         raise ValueError("Kismet URL must be HTTP(S), without embedded credentials")
     # Operator supplies a concrete Kismet JSON endpoint; auth stays in environment.
     headers = {"Accept": "application/json"}
-    env_name = request.get("tokenEnv", "STAR_WPA_KISMET_TOKEN")
+    env_name = "STAR_WPA_KISMET_TOKEN"
+    if request.get("tokenEnv", env_name) != env_name:
+        raise PermissionError("requests cannot select environment secrets")
     if os.environ.get(env_name):
+        approved = (policy or {}).get("kismetTokenUrls", [])
+        if not isinstance(approved, list) or url not in approved:
+            raise PermissionError("credential destination is outside local operator scope")
         headers["Authorization"] = "Bearer " + os.environ[env_name]
-    with urlopen(Request(url, headers=headers), timeout=duration(request)) as response:
+    with open_http(Request(url, headers=headers), timeout=duration(request)) as response:
         raw = response.read(MAX_BYTES + 1)
     if len(raw) > MAX_BYTES:
         raise ValueError("Kismet response exceeds byte limit")
@@ -120,7 +126,7 @@ def capture(request, policy):
     with tempfile.TemporaryDirectory(prefix="star-wpa-listener-") as directory:
         prefix = str(Path(directory) / "capture")
         argv[1:1] = ["--write", prefix]
-        with tempfile.TemporaryFile() as errors:
+        with open(os.devnull, 'wb') as errors:
             proc = subprocess.Popen(argv, stdout=subprocess.DEVNULL, stderr=errors, start_new_session=True)
             try:
                 try:
@@ -136,8 +142,11 @@ def capture(request, policy):
                 if code != 0:
                     raise RuntimeError("airodump-ng failed")
             finally:
-                if proc.poll() is None:
+                try:
                     os.killpg(proc.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                if proc.poll() is None:
                     proc.wait(timeout=3)
             path = Path(prefix + "-01.csv")
             if not path.is_file() or path.stat().st_size > MAX_BYTES:
@@ -156,7 +165,7 @@ def dispatch(actor, request, policy=None):
     operation = request.get("operation", "ingest")
     if actor == "kismet":
         if operation == "collect":
-            request = dict(request, devices=kismet_devices(request))
+            request = dict(request, devices=kismet_devices(request, policy))
         elif operation != "ingest":
             raise ValueError("unknown Kismet operation")
         return ingest_kismet(request)
@@ -184,11 +193,12 @@ def dispatch(actor, request, policy=None):
     argv = command(actor, request, policy)
     def execute():
         # Do not publish keys or subprocess output. Receipt proves process completion only.
-        with tempfile.TemporaryFile() as output:
-            result = subprocess.run(argv, stdout=output, stderr=output, timeout=duration(request), check=True)
+        from .tools import run_tool
+        result = run_tool(argv[0], {'argv': argv[1:], 'workingDirectory': str(Path.cwd()),
+                          'stdinFile': None, 'uiMode': 'headless'}, duration(request))
         receipt = document("event", request["dataset"], stable_id("effect", request["dataset"], actor, identity),
                            eventKind="wireless-" + actor, extensions={NS: {"requestId": identity, "bssid": mac(request["bssid"]),
-                           "exitCode": result.returncode, "outcome": "completed"}})
+                           "exitCode": result['exitCode'], "outcome": "completed"}})
         return validate_bundle([receipt])
     from .effects import run_once
     return run_once(actor, request, execute)

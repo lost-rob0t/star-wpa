@@ -17,8 +17,8 @@ class EffectTests(unittest.TestCase):
 
     def test_active_effect_is_once_and_rechecks_policy(self):
         with tempfile.TemporaryDirectory() as directory, patch.dict('os.environ', {'STAR_WPA_EFFECT_DB': directory + '/effects.sqlite'}):
-            with patch('star_wpa.adapters.subprocess.run') as run:
-                run.return_value.returncode = 0
+            with patch('star_wpa.tools.run_tool') as run:
+                run.return_value = {'exitCode': 0}
                 first = dispatch('deauth', self.request(), self.policy())
                 self.assertEqual(first, dispatch('deauth', self.request(), self.policy()))
                 self.assertEqual(run.call_count, 1)
@@ -30,7 +30,7 @@ class EffectTests(unittest.TestCase):
 
     def test_uncertain_effect_never_retries_automatically(self):
         with tempfile.TemporaryDirectory() as directory, patch.dict('os.environ', {'STAR_WPA_EFFECT_DB': directory + '/effects.sqlite'}):
-            with patch('star_wpa.adapters.subprocess.run', side_effect=RuntimeError('tool failed')) as run:
+            with patch('star_wpa.tools.run_tool', side_effect=RuntimeError('tool failed')) as run:
                 with self.assertRaises(RuntimeError):
                     dispatch('deauth', self.request(), self.policy())
                 with self.assertRaises(PermissionError):
@@ -38,7 +38,7 @@ class EffectTests(unittest.TestCase):
                 self.assertEqual(run.call_count, 1)
 
     def test_invalid_request_does_not_run_tool(self):
-        with patch('star_wpa.adapters.subprocess.run') as run:
+        with patch('star_wpa.tools.run_tool') as run:
             with self.assertRaises(ValueError):
                 dispatch('deauth', dict(self.request(), requestId=''), self.policy())
             run.assert_not_called()

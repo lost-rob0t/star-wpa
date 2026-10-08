@@ -11,9 +11,11 @@ import shutil
 import signal
 import subprocess
 import time
+import tempfile
 from pathlib import Path
 from .contracts import NS, document, stable_id, validate_bundle
 from .effects import run_once
+from .files import read_bounded
 
 CATALOG_DATA = json.loads((Path(__file__).parent / 'tool_catalog.json').read_text())
 CATALOG = {row['package']: row for row in CATALOG_DATA['packages']}
@@ -21,10 +23,15 @@ MAX_OUTPUT = 1024 * 1024
 
 
 def package_query(argv):
-    result = subprocess.run(argv, capture_output=True, text=True, timeout=5, check=False)
-    if len(result.stdout.encode()) > 8 * MAX_OUTPUT:
-        raise ValueError('package query exceeded observation limit')
-    return result
+    output = {'stdout': bytearray(), 'stderr': bytearray()}
+    try:
+        run_tool(argv[0], {'argv': argv[1:], 'workingDirectory': str(Path.cwd()),
+                 'stdinFile': None, 'uiMode': 'headless'}, 5,
+                 _capture=lambda label, data: output[label].extend(data))
+        code = 0
+    except subprocess.CalledProcessError as error:
+        code = error.returncode
+    return subprocess.CompletedProcess(argv, code, output['stdout'].decode(), output['stderr'].decode())
 
 
 def owns(package, path):
@@ -79,7 +86,7 @@ def pinned_installation(package, policy):
             raise FileNotFoundError('pinned tool executable is unavailable')
         if path.stat().st_size > 64 * MAX_OUTPUT:
             raise ValueError('pinned executable exceeds hashing bound')
-        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        digest = hashlib.sha256(read_bounded(path, 64 * MAX_OUTPUT)).hexdigest()
         if digest != entry['sha256']:
             raise PermissionError('pinned tool executable has changed')
         executables.append({'name': name, 'path': str(path.resolve())})
@@ -117,7 +124,7 @@ def kill_group(process, signum):
         pass
 
 
-def run_tool(path, invocation, seconds):
+def run_tool(path, invocation, seconds, *, _capture=None):
     """Own/drain/reap a real process group; redact content and bound retained work."""
     selector = selectors.DefaultSelector()
     process = None
@@ -129,16 +136,20 @@ def run_tool(path, invocation, seconds):
             master, slave = pty.openpty()
             os.set_blocking(master, False)
             if invocation['stdinFile']:
-                terminal_input = Path(invocation['stdinFile']).read_bytes()
+                terminal_input = read_bounded(invocation['stdinFile'], MAX_OUTPUT)
             process = subprocess.Popen([path, *invocation['argv']], cwd=invocation['workingDirectory'],
                 stdin=slave, stdout=slave, stderr=slave, start_new_session=True,
                 preexec_fn=lambda: fcntl.ioctl(slave, termios.TIOCSCTTY, 0))
             os.close(slave); slave = None
             selector.register(master, selectors.EVENT_READ | (selectors.EVENT_WRITE if terminal_input else 0), 'stdout')
         else:
-            source = open(invocation['stdinFile'], 'rb') if invocation['stdinFile'] else subprocess.DEVNULL
-            if source != subprocess.DEVNULL:
+            source = subprocess.DEVNULL
+            if invocation['stdinFile']:
+                raw = read_bounded(invocation['stdinFile'], MAX_OUTPUT)
+                source = tempfile.TemporaryFile()
                 handles.append(source)
+                source.write(raw)
+                source.seek(0)
             process = subprocess.Popen([path, *invocation['argv']], cwd=invocation['workingDirectory'],
                 stdin=source, stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
             for label, stream in [('stdout', process.stdout), ('stderr', process.stderr)]:
@@ -172,6 +183,8 @@ def run_tool(path, invocation, seconds):
                     if stream['bytes'] > MAX_OUTPUT:
                         raise ValueError('tool output exceeded per-stream limit')
                     stream['hash'].update(data)
+                    if _capture is not None:
+                        _capture(key.data, data)
         code = process.wait(timeout=1)
         if code != 0:
             raise subprocess.CalledProcessError(code, path)
@@ -204,9 +217,7 @@ def dispatch_tool(package, request, policy=None):
     discovered = discover_package(package)
     manifest = os.environ.get('STAR_WPA_NIX_TOOL_MANIFEST')
     if discovered['status'] != 'installed' and manifest:
-        raw = Path(manifest).read_bytes()
-        if len(raw) > 8 * MAX_OUTPUT:
-            raise ValueError('Nix tool manifest exceeds byte limit')
+        raw = read_bounded(manifest, 8 * MAX_OUTPUT)
         discovered = pinned_installation(package, json.loads(raw)) or discovered
     binding = (policy or {}).get('toolInstallations', {}).get(package, {})
     if discovered['status'] != 'installed' or binding.get('preferPinned') is True:

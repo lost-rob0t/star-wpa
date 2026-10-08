@@ -3,6 +3,7 @@ import hashlib
 import json
 import os
 import sqlite3
+import stat
 from contextlib import closing
 from pathlib import Path
 from .contracts import validate_bundle
@@ -12,10 +13,16 @@ def run_once(actor, request, operation):
     path = os.environ.get('STAR_WPA_EFFECT_DB')
     if not path:
         raise PermissionError('active effects require an operator-local effect ledger')
-    target = Path(path).resolve()
+    target = Path(path).absolute()
     target.parent.mkdir(parents=True, exist_ok=True)
-    fd = os.open(target, os.O_CREAT | os.O_RDWR, 0o600)
-    os.close(fd)
+    fd = os.open(target, os.O_CREAT | os.O_RDWR | os.O_NOFOLLOW | os.O_NONBLOCK, 0o600)
+    try:
+        info = os.fstat(fd)
+        if (not stat.S_ISREG(info.st_mode) or info.st_uid != os.geteuid()
+                or info.st_mode & 0o077 or info.st_nlink != 1):
+            raise PermissionError('effect ledger must be a private, owned regular file with one link')
+    finally:
+        os.close(fd)
     key = json.dumps([request['dataset'], actor, request['requestId']])
     fingerprint = hashlib.sha256(json.dumps(request, sort_keys=True, allow_nan=False).encode()).hexdigest()
     with closing(sqlite3.connect(target, timeout=5)) as db:
