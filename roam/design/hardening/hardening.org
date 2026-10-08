@@ -1,0 +1,62 @@
+:PROPERTIES:
+:ID: star-wpa-hardening-20261008
+:END:
+#+title: Wireless adapter hardening
+#+description: Prevent credential forwarding, bound external effects, and reject unsafe ledger files.
+#+status: IMPLEMENTED
+#+filetags: :rage:design:security:
+
+* Approval Table
+
+| Approval area | Required authority | State | Evidence required | Evidence reference |
+|---------------+--------------------+-------+-------------------+--------------------|
+| Implementation | Project owner | APPROVED | Explicit user instruction | User: hardening pass |
+| Merge on green | Project owner | APPROVED | Existing session authorization | User: Merge on green |
+| Radio execution | Local operator | NOT APPLICABLE | No radio effects executed | Tests use local fixtures only |
+
+* Verified Findings
+
+Kismet tokenEnv selects arbitrary process variables. Kismet and CouchDB use urllib default redirect forwarding. Specialized aircrack/deauth use unbounded output temporary files and do not own descendant process groups. Ledger creation follows symlinks and trusts existing permissions. Manifest and stdin reads bound size only before reads or after allocation.
+
+* Design
+
+Disable HTTP redirects while preserving proxies and TLS. Restrict Kismet to STAR_WPA_KISMET_TOKEN and require exact endpoint membership in local kismetTokenUrls before sending it. Reuse the bounded process-group runner for specialized active effects; discard unused capture diagnostics and fence descendants. Reject unsafe ledger ownership, links, modes and nonregular files. Read regular input files through opened descriptors with actual byte bounds; stage bounded stdin before launching.
+
+* Evaluation
+
+Regression tests use local HTTP endpoints, FIFO and unsafe ledger fixtures, bounded subprocess input/output, and existing at-most-once tests. Native/Nix/schema/views and live CouchDB gates run in CI. No hardware validation is claimed. Parent directories and executable installations remain operator-trusted; this is not an OS sandbox.
+
+* Changelog
+
+| Date | Change | Author or actor | Evidence |
+|------+--------+-----------------+----------|
+| 2026-10-08 | Hardening authorized and findings recorded | Codex | Source inspection and session |
+
+* IMPLEMENTED RAGE Execution Record
+:PROPERTIES:
+:STATUS_EVENT_ID: 7d3b2a74-7947-4006-9b3d-869c64d7990a
+:RECORDED_AT: 2026-10-08T22:02:26+00:00
+:END:
+
+** Summary
+Harden credential forwarding, active process bounds, regular-file reads and effect ledger admission.
+
+** Files
+- star_wpa/http.py
+- star_wpa/files.py
+- star_wpa/adapters.py
+- star_wpa/effects.py
+
+** Tests
+- 38 Python tests passed, including local HTTP credential redirect and unsafe file regressions
+- Generated views, offline schema lock and 57 tool actor declarations verified
+
+** Commits
+- None
+
+** Notes
+- Native and Nix verification continues before merge; parent directories and executable dependencies remain operator-trusted.
+
+* Additional Evaluation
+
+All 40 host Python tests pass, including package query overflow/nonzero status and concurrent effect admission. CI actions are pinned to resolved commit objects. The x86_64 flake check passed with 38 tests and native proof before final package-query changes; the final revision is checked again before merge.

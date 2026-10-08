@@ -65,7 +65,7 @@ star-wpa listener --request tests/fixtures/listener.json > /tmp/wireless-documen
 Each request includes a nonempty `dataset`. JSON inputs/outputs are limited to 8 MiB, and Kismet, listener and GPSD batches to 1,000 records. Provider inputs:
 
 - **Listener**: `receiverId` plus `observations` (BSSID, Unix `observedAt`, optional integer `signalDbm`, numeric receiver `latitude`/`longitude`, optional `distanceMeters`/`rangeAccuracyMeters`); alternatively `csv` from airodump. CSV time defaults to UTC; set `timezoneOffset` to the source offset. `receiverFix` is attached only within `maxFixAgeSeconds` (default five).
-- **Kismet**: `receiverId` and `devices` containing actual dotted-field device exports. `operation: "collect"` uses an explicit `url` that returns a device array, with an optional bearer token from `STAR_WPA_KISMET_TOKEN` (`tokenEnv` selects an alternative environment variable).
+- **Kismet**: `receiverId` and `devices` containing actual dotted-field device exports. `operation: "collect"` uses an explicit `url` that returns a device array, with an optional bearer token from `STAR_WPA_KISMET_TOKEN`. Credentialed collection requires the exact URL in deployment-local `kismetTokenUrls`; requests cannot select other environment variables.
 - **GPSD**: `receiverId` and `reports` containing TPV objects. `operation: "collect"` supports `host`, `port` and `maxReports`; only mode >= 2 fixes are emitted. Missing source time requires explicit Unix `observedAt`.
 - **Wardrive**: `receiverId` or `device_id`, and 1–100 exported `observations` using `id`, `address`, `level`, `latitude`, `longitude`, millisecond `time` and `radio` (`WIFI`, `BLE` or `BT`). HTTP authentication remains the server's responsibility; this package does not expose an unauthenticated ingestion endpoint.
 
@@ -117,3 +117,7 @@ The resolver groups by dataset, transmitter and fixed Unix time buckets (`window
 `python3 scripts/live-couchdb-proof.py` provisions its own disposable Docker CouchDB, exercises real view indexing, idempotent replay, graph hydration and four-receiver solving, then removes the container. It requires Docker socket access. Physical RF, a real Kismet deployment and a GPS device remain separate integration checks.
 
 See [migration ownership](docs/MIGRATION.md) and the [implementation evidence](roam/design/wireless/wireless-package.org).
+
+HTTP collection and CouchDB requests reject redirects to prevent forwarding credentials. Configure the final endpoint URL directly. Existing credentialed Kismet deployments must add `"kismetTokenUrls": ["https://kismet.example/devices.json"]` to their local policy.
+
+The effect ledger must be a regular file owned by the running user, with mode `0600` and one hard link; symlinks are rejected. Keep its parent directory private and trusted. Existing ledgers with shared permissions must be corrected locally before execution. Input JSON, manifests and stdin are read as bounded regular files; FIFO/device inputs are rejected. Aircrack/deauth now have the same 1 MiB per-stream limit and process-group cleanup as generic tool actors. These controls do not sandbox installed tools: executable dependencies, PATH, working directories and policy remain operator-trusted.

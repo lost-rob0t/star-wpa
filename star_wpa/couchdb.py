@@ -4,7 +4,8 @@ import json
 import os
 from urllib.error import HTTPError
 from urllib.parse import quote, urlencode, urlparse
-from urllib.request import Request, urlopen
+from urllib.request import Request
+from .http import open_http
 from .contracts import validate, validate_bundle
 from .adapters import MAX_BYTES
 
@@ -37,7 +38,7 @@ class CouchDB:
         if self.auth:
             headers['Authorization'] = self.auth
         data = json.dumps(body, allow_nan=False).encode() if body is not None else None
-        with urlopen(Request(url, data=data, headers=headers, method=method), timeout=self.timeout) as response:
+        with open_http(Request(url, data=data, headers=headers, method=method), timeout=self.timeout) as response:
             raw = response.read(MAX_BYTES + 1)
         if len(raw) > MAX_BYTES:
             raise ValueError('CouchDB response exceeds byte limit; use smaller query windows')

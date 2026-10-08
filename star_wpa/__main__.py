@@ -6,14 +6,11 @@ import sys
 from pathlib import Path
 from .adapters import MAX_BYTES, dispatch
 from .tools import CATALOG
+from .files import read_bounded
 
 
 def load_json(path):
-    with Path(path).open('rb') as stream:
-        raw = stream.read(MAX_BYTES + 1)
-    if len(raw) > MAX_BYTES:
-        raise ValueError("input exceeds byte limit")
-    return json.loads(raw)
+    return json.loads(read_bounded(path, MAX_BYTES))
 
 
 def main():
