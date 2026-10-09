@@ -1,4 +1,4 @@
-{ lib, stdenv, fetchurl, cmake, pkg-config, gnuradio, libosmocore, cppunit, mpir, fftwFloat, libsndfile }:
+{ lib, stdenv, fetchurl, cmake, pkg-config, gnuradio, libosmocore, cppunit, mpir, gmp, fftwFloat, libsndfile }:
 
 let
   # Take all ABI-sensitive dependencies from the same GNU Radio package scope.
@@ -38,6 +38,7 @@ mkDerivation {
     libosmocore
     cppunit
     mpir
+    gmp
     fftwFloat
     libsndfile
     python.pkgs.numpy
@@ -69,7 +70,13 @@ mkDerivation {
     # The port installs under gnuradio.gsm. Fix remaining old package names and
     # the Qt5 SIP import used unconditionally by gnuradio.gsm's __init__.py.
     substituteInPlace apps/grgsm_trx \
-      --replace-fail 'from gsm.trx import' 'from gnuradio.gsm.trx import'
+      --replace-fail 'from gsm.trx' 'from gnuradio.gsm.trx' \
+      --replace-fail 'from gnuradio.gsm.trx.radio_if_lms import RadioInterfaceLMS as Radio' \
+        'raise RuntimeError("LimeSDR TRX is not packaged in this Nix profile; only the UHD driver dependency is provided")' \
+      --replace-fail 'Set device driver (default %(default)s)' \
+        'Set device driver (default %(default)s; Nix profile supports UHD only)'
+    substituteInPlace apps/grgsm_decode \
+      --replace-fail 'blocks.byte_t' 'gr.types.byte_t'
     substituteInPlace python/gsm/trx/radio_if.py \
       --replace-fail 'from gnuradio import blocks' 'from gnuradio import blocks, pdu' \
       --replace-fail 'blocks.pdu_to_tagged_stream' 'pdu.pdu_to_tagged_stream' \
@@ -118,13 +125,19 @@ mkDerivation {
     runHook preInstallCheck
     unset CMAKE_BINARY_DIR
     export PYTHONPATH="$out/${python.sitePackages}:${buildRadio.pythonEnv}/${python.sitePackages}"
-    ${python.interpreter} -c 'from gnuradio import gsm; import gnuradio.gsm.gsm_python; import osmosdr; assert callable(gsm.version)'
+    ${python.interpreter} -c 'from gnuradio import gr, gsm; import gnuradio.gsm.gsm_python; import gnuradio.gsm.trx.radio_if_uhd; import osmosdr; assert callable(gsm.version); assert gr.types.byte_t is not None'
     for program in grgsm_decode grgsm_scanner grgsm_trx grgsm_capture grgsm_channelize; do
       # These scripts parse --help before constructing a top block, opening
       # sockets, discovering devices, or reading an input capture.
       "$out/bin/$program" --help > "$program-help.txt"
       grep -qi usage "$program-help.txt"
     done
+    # This selected branch fails before Radio(...) or any socket/device setup.
+    if "$out/bin/grgsm_trx" --driver=lms > unsupported-lms.txt 2>&1; then
+      echo "unsupported LimeSDR driver unexpectedly accepted" >&2
+      exit 1
+    fi
+    grep -q 'LimeSDR TRX is not packaged in this Nix profile' unsupported-lms.txt
     test -x "$out/bin/grgsm_livemon"
     test -x "$out/bin/grgsm_livemon_headless"
     runHook postInstallCheck

@@ -61,6 +61,7 @@
           available = builtins.filter (row: row.available) entries;
           coverageRows = map (row: {
             inherit (row) package attribute available reason requiredExecutables;
+            limitations = row.limitations or [ ];
           }) entries;
           coverage = pkgs.writeText "star-wpa-nix-tool-coverage.json" (builtins.toJSON coverageRows);
           coreEntries = builtins.filter (row: row.package == "aircrack-ng") available;

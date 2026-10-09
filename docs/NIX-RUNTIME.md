@@ -76,7 +76,10 @@ Gr-gsm uses Debian's GNU Radio 3.10 port and Boost compatibility patches plus
 narrow import/API corrections. Its seven `grgsm_*` programs share the same
 wrapped GNU Radio, OsmoSDR, Python, and SciPy environment. Checks cover module
 imports and non-GUI help paths; no GSM device, capture, receive, transmit, or
-protocol behavior is claimed to have been tested.
+protocol behavior is claimed to have been tested. The optional grgsm_trx
+LimeSDR (`--driver=lms`) module is **not packaged**; that selection returns an
+explicit unsupported-driver error before any radio is constructed. UHD imports
+are checked, but this does not establish hardware readiness.
 
 Wifiphisher remains excluded for a concrete reason beyond a missing recipe:
 the inspected [roguehostapd revision](https://github.com/wifiphisher/roguehostapd/blob/381b373b4b3394d916e8c7a19b10d6c3c491bd13/roguehostapd/buildutil/build_files.py)
