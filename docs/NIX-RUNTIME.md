@@ -55,7 +55,8 @@ apt, Git checkout, substitute program, or implicit download fills these gaps.
 `bluez-hcidump` is intentionally unavailable: the pinned BlueZ 5.87 does not
 install `hcidump`; `btmon` is not silently substituted. `mdk3` uses nixpkgs'
 `mdk3-master` fork, `reaver` uses `reaverwps-t6x`, and `wifite` uses `wifite2`.
-`gr-osmosdr` uses GNU Radio with the OsmoSDR module, so its scripts receive the
+`rfcat` uses the pinned Python 3.12 scope because its `future` dependency does
+not support the pin's default Python 3.14. `gr-osmosdr` uses GNU Radio with the OsmoSDR module, so its scripts receive the
 matching Python module environment. `tshark` binds only the tshark executable
 from the same Wireshark output used by the GUI actor; `rfkill` similarly binds
 only rfkill from util-linux. This avoids unrelated executables in split-package

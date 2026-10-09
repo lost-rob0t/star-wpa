@@ -247,7 +247,7 @@
     },
     {
       "package": "rfcat",
-      "attribute": "python3Packages.rfcat",
+      "attribute": "python312Packages.rfcat",
       "requiredExecutables": [
         "rfcat"
       ]
