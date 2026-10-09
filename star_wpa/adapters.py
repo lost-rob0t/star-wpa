@@ -81,7 +81,17 @@ def kismet_devices(request, policy=None):
         approved = (policy or {}).get("kismetTokenUrls", [])
         if not isinstance(approved, list) or url not in approved:
             raise PermissionError("credential destination is outside local operator scope")
-        headers["Authorization"] = "Bearer " + os.environ[env_name]
+        token = os.environ[env_name]
+        auth = (policy or {}).get("kismetTokenAuth", "bearer")
+        if auth == "bearer":
+            headers["Authorization"] = "Bearer " + token
+        elif auth == "cookie":
+            # RFC 6265 cookie-octet; reject separators/control bytes before I/O.
+            if any(ord(char) < 0x21 or ord(char) > 0x7e or char in '",;\\' for char in token):
+                raise ValueError("invalid Kismet cookie token")
+            headers["Cookie"] = "KISMET=" + token
+        else:
+            raise ValueError("unknown deployment Kismet token authentication")
     with open_http(Request(url, headers=headers), timeout=duration(request)) as response:
         raw = response.read(MAX_BYTES + 1)
     if len(raw) > MAX_BYTES:
