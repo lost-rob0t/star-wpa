@@ -56,7 +56,22 @@ The runtime verifies exact source hashes for either a pinned Git checkout or an 
 
 Local native messages are operator-local request filenames. The declarations intentionally have empty portable `accepts`/`produces` contracts: this host adapter boundary is not a new StarIntel document/message type. Emitted JSON batches are validated against generated canonical contracts. No prototype systems are used.
 
-The effect adapter can also be exercised directly:
+Every actor also has an installed shell command. For example:
+
+```sh
+sa-listener --request tests/fixtures/listener.json
+sa-wifiphisher --request tests/fixtures/tool-discovery.json
+sa-tool-kismet --request tests/fixtures/tool-discovery.json
+```
+
+All 7 core and 57 package actors are covered. Use `sa-<actor/tool-name>`;
+`sa-tool-<package>` is available for every tool, including the Kismet/GPSD
+package actors whose short names belong to the core ingestion actors.
+Each command supports `--help`, accepts the same bounded JSON request file,
+and preserves local policy and effect-ledger protections. See the
+[complete command inventory and shell contract](docs/SHELL-COMMANDS.md).
+
+The original effect adapter interface remains available:
 
 ```sh
 star-wpa listener --request tests/fixtures/listener.json > /tmp/wireless-documents.json
