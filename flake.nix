@@ -27,6 +27,11 @@
           catalog = builtins.fromJSON (builtins.readFile ./star_wpa/tool_catalog.json);
           inventory = builtins.fromJSON (builtins.readFile ./catalog/nix-tools.json);
           providers = pkgs // {
+            starWpa = {
+              bluelog = pkgs.callPackage ./nix/providers/bluelog.nix { };
+              bluez-hcidump = pkgs.callPackage ./nix/providers/bluez-hcidump.nix { };
+              eapmd5pass = pkgs.callPackage ./nix/providers/eapmd5pass.nix { };
+            };
             gnuradioWithOsmosdr = pkgs.gnuradio.override {
               extraPackages = [ pkgs.gnuradioPackages.osmosdr ];
             };

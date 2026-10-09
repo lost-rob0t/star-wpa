@@ -34,15 +34,15 @@ The `adapters` package is the explicitly unbundled Python package for embedders.
 
 ## Exact coverage, including gaps
 
-The explicit inventory maps all **57 catalog package actors**. Currently **43**
+The explicit inventory maps all **57 catalog package actors**. Currently **46**
 have declared pinned providers, including Debian-to-Nix name differences and
 GNU Radio's wrapped OsmoSDR programs. Platform restrictions are reported at
 flake evaluation; command presence is verified against built outputs.
 
-These **14** do not have a supported provider in this pin:
+These **11** do not have a supported provider in this pin:
 
-- bluelog, blueranger, bluez-hcidump, btscanner
-- eaphammer, eapmd5pass, fern-wifi-cracker, gr-gsm
+- blueranger, btscanner
+- eaphammer, fern-wifi-cracker, gr-gsm
 - hostapd-wpe, king-phisher, mfterm, rtlsdr-scanner
 - wifi-honey, wifiphisher
 
@@ -52,8 +52,17 @@ Adding one requires a reviewed source-and-hash-pinned derivation, a matching
 inventory entry, and a passing executable discovery build. No unpinned pip,
 apt, Git checkout, substitute program, or implicit download fills these gaps.
 
-`bluez-hcidump` is intentionally unavailable: the pinned BlueZ 5.87 does not
-install `hcidump`; `btmon` is not silently substituted. `mdk3` uses nixpkgs'
+Three providers have local, source-and-hash-pinned derivations under
+`nix/providers`: Bluelog, the original BlueZ hcidump 2.5, and eapmd5pass.
+Bluelog includes its web assets and vendor lookup data generated offline from
+the same nixpkgs pin's hwdata source. Its optional `/etc/bluelog/bluelog.conf`
+remains operator-owned; an example lives under the package's `share/bluelog`.
+No upstream installer or runtime downloader is invoked. Build checks use only
+source-inspected help/version paths before any hardware setup.
+
+The original `hcidump` is packaged separately because BlueZ 5.87 no longer
+includes it; `btmon` is not substituted. These old tools are not made modern or
+safe for arbitrary untrusted inputs by packaging them. `mdk3` uses nixpkgs'
 `mdk3-master` fork, `reaver` uses `reaverwps-t6x`, and `wifite` uses `wifite2`.
 `rfcat` uses the pinned Python 3.12 scope because its `future` dependency does
 not support the pin's default Python 3.14. `gr-osmosdr` uses GNU Radio with the OsmoSDR module, so its scripts receive the
