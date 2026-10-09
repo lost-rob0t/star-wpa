@@ -16,9 +16,9 @@ stdenv.mkDerivation {
 
   makeFlags = [
     "CC=${stdenv.cc.targetPrefix}cc"
-    # The old-style declarations in this upstream predate C23 prototypes.
-    "CFLAGS=-O2 -Wall -std=gnu17"
   ];
+  # The old-style declarations in this upstream predate C23 prototypes.
+  env.NIX_CFLAGS_COMPILE = "-std=gnu17";
   # The upstream link target uses utils.o without declaring that dependency.
   enableParallelBuilding = false;
 

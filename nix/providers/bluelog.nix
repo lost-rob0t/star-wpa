@@ -13,7 +13,8 @@ stdenv.mkDerivation {
   dontConfigure = true;
   buildInputs = [ bluez ];
   nativeBuildInputs = [ gawk gnused ];
-  makeFlags = [ "CC=${stdenv.cc.targetPrefix}cc" "CFLAGS=-O2 -Wall -std=gnu17" ];
+  makeFlags = [ "CC=${stdenv.cc.targetPrefix}cc" ];
+  env.NIX_CFLAGS_COMPILE = "-std=gnu17";
   buildFlags = [ "bluelog" "livelog" ];
 
   postPatch = ''
@@ -32,6 +33,8 @@ stdenv.mkDerivation {
     cp -r www/. "$out/share/bluelog/www/"
     ln -s bluelog.css "$out/share/bluelog/www/style.css"
     cp COPYING README README.LIVE ChangeLog "$out/share/doc/bluelog/"
+    mkdir -p "$out/share/doc/bluelog/hwdata"
+    cp ${hwdata.src}/COPYING ${hwdata.src}/LICENSE "$out/share/doc/bluelog/hwdata/"
     # Match upstream's libmackerel CSV format using the already pinned hwdata
     # input. Do not run Makefile install or scripts/gen_oui.sh (both download).
     grep '(hex)' ${hwdata.src}/oui.txt \
