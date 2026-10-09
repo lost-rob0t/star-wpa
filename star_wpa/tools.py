@@ -15,7 +15,7 @@ import tempfile
 from pathlib import Path
 from .contracts import NS, document, stable_id, validate_bundle
 from .effects import run_once
-from .files import read_bounded
+from .files import read_bounded, sha256_bounded
 
 CATALOG_DATA = json.loads((Path(__file__).parent / 'tool_catalog.json').read_text())
 CATALOG = {row['package']: row for row in CATALOG_DATA['packages']}
@@ -84,9 +84,7 @@ def pinned_installation(package, policy):
         path = Path(entry['path'])
         if not path.is_absolute() or not path.is_file() or not os.access(path, os.X_OK):
             raise FileNotFoundError('pinned tool executable is unavailable')
-        if path.stat().st_size > 64 * MAX_OUTPUT:
-            raise ValueError('pinned executable exceeds hashing bound')
-        digest = hashlib.sha256(read_bounded(path, 64 * MAX_OUTPUT)).hexdigest()
+        digest = sha256_bounded(path)
         if digest != entry['sha256']:
             raise PermissionError('pinned tool executable has changed')
         executables.append({'name': name, 'path': str(path.resolve())})

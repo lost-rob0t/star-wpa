@@ -66,3 +66,18 @@ class NixRuntimeTests(unittest.TestCase):
                 self.assertEqual(info['reason'], 'not packaged in pinned nixpkgs')
                 with self.assertRaises(FileNotFoundError):
                     dispatch_tool('wifiphisher', {'dataset': 'test', 'operation': 'execute'})
+
+    def test_executable_hashing_streams_and_retains_finite_regular_file_bound(self):
+        import hashlib
+        from star_wpa.files import sha256_bounded
+        with tempfile.TemporaryDirectory() as directory:
+            binary = Path(directory) / 'large-tool'
+            raw = b'x' * (2 * 1024 * 1024 + 3)
+            binary.write_bytes(raw)
+            self.assertEqual(sha256_bounded(binary, len(raw)), hashlib.sha256(raw).hexdigest())
+            with self.assertRaisesRegex(ValueError, 'byte limit'):
+                sha256_bounded(binary, len(raw) - 1)
+            fifo = Path(directory) / 'fifo'
+            os.mkfifo(fifo)
+            with self.assertRaisesRegex(ValueError, 'regular file'):
+                sha256_bounded(fifo)

@@ -3,11 +3,14 @@
 
 This only reads package outputs. It never starts tools, services, or hardware.
 """
-import hashlib
 import json
 import os
 import sys
 from pathlib import Path
+
+# This is a source-tree build helper, not the installed-runtime proof.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from star_wpa.files import sha256_bounded
 
 
 def build_bindings(inputs):
@@ -29,9 +32,7 @@ def build_bindings(inputs):
                 if prefix and not path.name.startswith(prefix):
                     continue
                 if path.is_file() and os.access(path, os.X_OK):
-                    if path.stat().st_size > 64 * 1024 * 1024:
-                        raise ValueError(f'{row["package"]}: executable exceeds runtime hashing bound: {path.name}')
-                    entry = {'path': str(path.resolve()), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}
+                    entry = {'path': str(path.resolve()), 'sha256': sha256_bounded(path)}
                     if path.name in executables and executables[path.name] != entry:
                         raise ValueError(f'{row["package"]}: ambiguous executable: {path.name}')
                     executables[path.name] = entry

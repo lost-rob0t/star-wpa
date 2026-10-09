@@ -76,7 +76,9 @@ nix flake check -L
 `tool-coverage` is a declaration, not proof that a build succeeded. Building
 `tool-bindings` fails if a declared provider is empty or lacks required
 executables. Hash-verified manifests enumerate actual executable paths in
-`/nix/store`. Every packaged actor wrapper sets the manifest and dependency
+`/nix/store`. Executable hashing streams in 1 MiB chunks with a separate
+512 MiB executable limit (large Go tools such as bettercap exceed 64 MiB);
+request, manifest, and output limits remain unchanged. Every packaged actor wrapper sets the manifest and dependency
 PATH, including `nix run` outside a development shell. A selected Nix manifest
 wins over any host dpkg installation; missing packages stay visibly missing.
 Explicit deployment-local pinned overrides remain available through policy.
