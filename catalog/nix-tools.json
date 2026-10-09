@@ -101,7 +101,7 @@
     },
     {
       "package": "gnuradio",
-      "attribute": "gnuradioWithOsmosdr",
+      "attribute": "gnuradioWithWirelessModules",
       "requiredExecutables": []
     },
     {
@@ -120,13 +120,24 @@
     },
     {
       "package": "gr-gsm",
-      "attribute": null,
-      "requiredExecutables": [],
-      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+      "attribute": "gnuradioWithWirelessModules",
+      "requiredExecutables": [
+        "grgsm_decode",
+        "grgsm_scanner",
+        "grgsm_trx",
+        "grgsm_capture",
+        "grgsm_channelize",
+        "grgsm_livemon",
+        "grgsm_livemon_headless"
+      ],
+      "executablePrefix": "grgsm_",
+      "limitations": [
+        "The optional grgsm_trx LimeSDR driver is not packaged; only UHD imports are checked, with no live hardware validation."
+      ]
     },
     {
       "package": "gr-osmosdr",
-      "attribute": "gnuradioWithOsmosdr",
+      "attribute": "gnuradioWithWirelessModules",
       "requiredExecutables": [
         "osmocom_fft",
         "osmocom_siggen_nogui"
@@ -220,9 +231,13 @@
     },
     {
       "package": "mfterm",
-      "attribute": null,
-      "requiredExecutables": [],
-      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+      "attribute": "starWpa.mfterm",
+      "requiredExecutables": [
+        "mfterm"
+      ],
+      "limitations": [
+        "Upstream warns against root execution and loading untrusted tag, dictionary, or specification files."
+      ]
     },
     {
       "package": "multimon-ng",
@@ -317,6 +332,9 @@
       "attribute": "starWpa.wifi-honey",
       "requiredExecutables": [
         "wifi-honey"
+      ],
+      "limitations": [
+        "Upstream assumes legacy mon0 through mon4 interfaces; modern airmon-ng live compatibility is not established."
       ]
     },
     {
