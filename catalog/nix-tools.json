@@ -34,9 +34,10 @@
     },
     {
       "package": "blueranger",
-      "attribute": null,
-      "requiredExecutables": [],
-      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+      "attribute": "starWpa.blueranger",
+      "requiredExecutables": [
+        "blueranger"
+      ]
     },
     {
       "package": "bluesnarfer",
@@ -59,9 +60,10 @@
     },
     {
       "package": "btscanner",
-      "attribute": null,
-      "requiredExecutables": [],
-      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+      "attribute": "starWpa.btscanner",
+      "requiredExecutables": [
+        "btscanner"
+      ]
     },
     {
       "package": "bully",
@@ -312,15 +314,16 @@
     },
     {
       "package": "wifi-honey",
-      "attribute": null,
-      "requiredExecutables": [],
-      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+      "attribute": "starWpa.wifi-honey",
+      "requiredExecutables": [
+        "wifi-honey"
+      ]
     },
     {
       "package": "wifiphisher",
       "attribute": null,
       "requiredExecutables": [],
-      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+      "reason": "Default-excluded: upstream roguehostapd bundles unreviewed legacy hostapd 2.6 and obsolete Python imports; an audited daemon update/backport is required before packaging."
     },
     {
       "package": "wifite",

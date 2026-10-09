@@ -29,6 +29,9 @@
           providers = pkgs // {
             starWpa = {
               bluelog = pkgs.callPackage ./nix/providers/bluelog.nix { };
+              blueranger = pkgs.callPackage ./nix/providers/blueranger.nix { };
+              btscanner = pkgs.callPackage ./nix/providers/btscanner.nix { };
+              wifi-honey = pkgs.callPackage ./nix/providers/wifi-honey.nix { };
               bluez-hcidump = pkgs.callPackage ./nix/providers/bluez-hcidump.nix { };
               eapmd5pass = pkgs.callPackage ./nix/providers/eapmd5pass.nix { };
             };
