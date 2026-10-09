@@ -1,0 +1,21 @@
+--- a/wifi_honey.sh
++++ b/wifi_honey.sh
+@@ -9 +9 @@
+-if [ "$1" == "-h" -o "$1" == "-?" ]
++if [ "$1" == "-h" -o "$1" == "-?" -o "$1" == "--help" ]
+@@ -18 +18 @@
+-	exit 1
++	exit 0
+@@ -34,0 +35,9 @@
++# Keep generated screen configuration and capture files outside the Nix store.
++# Each invocation gets private state; retain captures after screen exits.
++umask 077
++STATE_ROOT="${XDG_STATE_HOME:-${HOME:?HOME or XDG_STATE_HOME must be set}/.local/state}/wifi-honey"
++mkdir -p -- "$STATE_ROOT" || exit 1
++SESSION_DIR=$(mktemp -d "$STATE_ROOT/session.XXXXXXXX") || exit 1
++cd -- "$SESSION_DIR" || exit 1
++printf 'Capture directory: %s\n' "$SESSION_DIR"
++
+@@ -46 +55 @@
+-sed "s/<ESSID>/$ESSID/" wifi_honey_template.rc | sed "s/<CHANNEL>/$CHANNEL/" > screen_wifi_honey.rc
++sed "s/<ESSID>/$ESSID/" "@template@" | sed "s/<CHANNEL>/$CHANNEL/" > screen_wifi_honey.rc

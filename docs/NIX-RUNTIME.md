@@ -34,17 +34,16 @@ The `adapters` package is the explicitly unbundled Python package for embedders.
 
 ## Exact coverage, including gaps
 
-The explicit inventory maps all **57 catalog package actors**. Currently **46**
+The explicit inventory maps all **57 catalog package actors**. Currently **49**
 have declared pinned providers, including Debian-to-Nix name differences and
 GNU Radio's wrapped OsmoSDR programs. Platform restrictions are reported at
 flake evaluation; command presence is verified against built outputs.
 
-These **11** do not have a supported provider in this pin:
+These **8** do not have a supported provider in this pin:
 
-- blueranger, btscanner
 - eaphammer, fern-wifi-cracker, gr-gsm
 - hostapd-wpe, king-phisher, mfterm, rtlsdr-scanner
-- wifi-honey, wifiphisher
+- wifiphisher
 
 This is therefore **not yet a complete 57-tool Nix distribution**. These actors
 remain installed, but Nix discovery returns `nix-unavailable` with a reason.
@@ -52,13 +51,33 @@ Adding one requires a reviewed source-and-hash-pinned derivation, a matching
 inventory entry, and a passing executable discovery build. No unpinned pip,
 apt, Git checkout, substitute program, or implicit download fills these gaps.
 
-Three providers have local, source-and-hash-pinned derivations under
-`nix/providers`: Bluelog, the original BlueZ hcidump 2.5, and eapmd5pass.
+Six providers have local, source-and-hash-pinned derivations under
+`nix/providers`: Bluelog, BlueRanger, Btscanner, the original BlueZ hcidump 2.5,
+eapmd5pass, and Wifi-Honey.
 Bluelog includes its web assets and vendor lookup data generated offline from
 the same nixpkgs pin's hwdata source. Its optional `/etc/bluelog/bluelog.conf`
 remains operator-owned; an example lives under the package's `share/bluelog`.
 No upstream installer or runtime downloader is invoked. Build checks use only
 source-inspected help/version paths before any hardware setup.
+
+BlueRanger uses Kali's preserved original source and packaging provenance;
+Btscanner applies Debian's complete security/build patch series. Wifi-Honey
+uses the original DigiNinja release, a packaged screen template, and private
+per-session capture directories under `XDG_STATE_HOME/wifi-honey`. Its original
+radio logic still assumes legacy `mon0`–`mon4` interface creation. Compatibility
+with modern airmon-ng is **not established**: availability here proves packaging
+and harmless help, not a working live-radio workflow. No interface is changed
+by building or entering a shell.
+
+Wifiphisher remains excluded for a concrete reason beyond a missing recipe:
+the inspected [roguehostapd revision](https://github.com/wifiphisher/roguehostapd/blob/381b373b4b3394d916e8c7a19b10d6c3c491bd13/roguehostapd/buildutil/build_files.py)
+bundles hostapd 2.6, enables WPS UPnP at
+build time, and predates the [2020 upstream security fixes](https://w1.fi/security/2020-1/upnp-subscribe-misbehavior-wps-ap.txt).
+Exposure depends on runtime `upnp_iface` configuration; it is not established
+for every default configuration. The Python bindings also use `SafeConfigParser`,
+removed in Python 3.12. A maintained daemon rebase or full security-backport audit
+and compatibility validation is needed. No insecure-package override or silent
+replacement is enabled by this flake.
 
 The original `hcidump` is packaged separately because BlueZ 5.87 no longer
 includes it; `btmon` is not substituted. These old tools are not made modern or
