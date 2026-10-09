@@ -34,15 +34,15 @@ The `adapters` package is the explicitly unbundled Python package for embedders.
 
 ## Exact coverage, including gaps
 
-The explicit inventory maps all **57 catalog package actors**. Currently **49**
+The explicit inventory maps all **57 catalog package actors**. Currently **51**
 have declared pinned providers, including Debian-to-Nix name differences and
 GNU Radio's wrapped OsmoSDR programs. Platform restrictions are reported at
 flake evaluation; command presence is verified against built outputs.
 
-These **8** do not have a supported provider in this pin:
+These **6** do not have a supported provider in this pin:
 
-- eaphammer, fern-wifi-cracker, gr-gsm
-- hostapd-wpe, king-phisher, mfterm, rtlsdr-scanner
+- eaphammer, fern-wifi-cracker
+- hostapd-wpe, king-phisher, rtlsdr-scanner
 - wifiphisher
 
 This is therefore **not yet a complete 57-tool Nix distribution**. These actors
@@ -51,9 +51,9 @@ Adding one requires a reviewed source-and-hash-pinned derivation, a matching
 inventory entry, and a passing executable discovery build. No unpinned pip,
 apt, Git checkout, substitute program, or implicit download fills these gaps.
 
-Six providers have local, source-and-hash-pinned derivations under
+Eight providers have local, source-and-hash-pinned derivations under
 `nix/providers`: Bluelog, BlueRanger, Btscanner, the original BlueZ hcidump 2.5,
-eapmd5pass, and Wifi-Honey.
+eapmd5pass, Wifi-Honey, mfterm, and gr-gsm.
 Bluelog includes its web assets and vendor lookup data generated offline from
 the same nixpkgs pin's hwdata source. Its optional `/etc/bluelog/bluelog.conf`
 remains operator-owned; an example lives under the package's `share/bluelog`.
@@ -68,6 +68,15 @@ radio logic still assumes legacy `mon0`–`mon4` interface creation. Compatibili
 with modern airmon-ng is **not established**: availability here proves packaging
 and harmless help, not a working live-radio workflow. No interface is changed
 by building or entering a shell.
+
+Mfterm is built against the pinned libnfc and maintained OpenSSL. Its upstream
+explicitly warns against running as root or loading untrusted tag, dictionary,
+or specification files; packaging does not repair those parser-safety limits.
+Gr-gsm uses Debian's GNU Radio 3.10 port and Boost compatibility patches plus
+narrow import/API corrections. Its seven `grgsm_*` programs share the same
+wrapped GNU Radio, OsmoSDR, Python, and SciPy environment. Checks cover module
+imports and non-GUI help paths; no GSM device, capture, receive, transmit, or
+protocol behavior is claimed to have been tested.
 
 Wifiphisher remains excluded for a concrete reason beyond a missing recipe:
 the inspected [roguehostapd revision](https://github.com/wifiphisher/roguehostapd/blob/381b373b4b3394d916e8c7a19b10d6c3c491bd13/roguehostapd/buildutil/build_files.py)

@@ -26,6 +26,7 @@
           source = lib.cleanSource self;
           catalog = builtins.fromJSON (builtins.readFile ./star_wpa/tool_catalog.json);
           inventory = builtins.fromJSON (builtins.readFile ./catalog/nix-tools.json);
+          grGsm = pkgs.callPackage ./nix/providers/gr-gsm.nix { };
           providers = pkgs // {
             starWpa = {
               bluelog = pkgs.callPackage ./nix/providers/bluelog.nix { };
@@ -34,9 +35,11 @@
               wifi-honey = pkgs.callPackage ./nix/providers/wifi-honey.nix { };
               bluez-hcidump = pkgs.callPackage ./nix/providers/bluez-hcidump.nix { };
               eapmd5pass = pkgs.callPackage ./nix/providers/eapmd5pass.nix { };
+              mfterm = pkgs.callPackage ./nix/providers/mfterm.nix { };
             };
-            gnuradioWithOsmosdr = pkgs.gnuradio.override {
-              extraPackages = [ pkgs.gnuradioPackages.osmosdr ];
+            gnuradioWithWirelessModules = pkgs.gnuradio.override {
+              extraPackages = [ pkgs.gnuradioPackages.osmosdr grGsm ];
+              extraPythonPackages = [ pkgs.gnuradio.python.pkgs.scipy ];
             };
           };
           # Every catalog entry is deliberate. A bad supported attribute or broken
