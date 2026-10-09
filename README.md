@@ -42,6 +42,19 @@ sbcl --script scripts/native-proof.lisp
 
 The runtime verifies exact source hashes for either a pinned Git checkout or an immutable Nix source export; dirty Git checkouts are rejected. Schema and runtime share the exact commit in `schema/starintel-schema.lock.json`; the vendored release is copied and checked by the upstream consumer sync tool. Never edit generated contracts locally.
 
+## Test an existing laptop installation
+
+Activate the existing Python environment, then run the offline-only smoke check:
+
+```sh
+python3 scripts/check-installed-cli.py --installed --summary /tmp/star-wpa-smoke-summary.json
+```
+
+This mode does not build/install packages or use radios/services. It exercises
+all installed command help, synthetic saved inputs, schema-valid results and
+safe failure paths, then creates a private sanitized report without overwriting
+an existing file. See the [one-hour laptop acceptance checklist](docs/LAPTOP-ACCEPTANCE.md).
+
 ## Use the actors
 
 ```lisp
