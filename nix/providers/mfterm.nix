@@ -19,7 +19,7 @@ stdenv.mkDerivation {
       --replace-fail 'AM_INIT_AUTOMAKE' 'AM_INIT_AUTOMAKE([foreign])'
     # OpenSSL 3 retains the DES API needed for Mifare MAC compatibility, but
     # deprecates it. Keep warnings visible rather than pinning old OpenSSL.
-    substituteInPlace Makefile.am --replace-fail ' -Werror' ''
+    substituteInPlace Makefile.am --replace-fail ' -Werror' ""
   '';
 
   postInstall = ''
