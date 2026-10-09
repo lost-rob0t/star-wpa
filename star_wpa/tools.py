@@ -214,11 +214,18 @@ def dispatch_tool(package, request, policy=None):
         raise ValueError('unknown catalog package')
     dataset = request['dataset']
     document('event', dataset, 'wpa:tool-preflight')
-    discovered = discover_package(package)
     manifest = os.environ.get('STAR_WPA_NIX_TOOL_MANIFEST')
-    if discovered['status'] != 'installed' and manifest:
-        raw = read_bounded(manifest, 8 * MAX_OUTPUT)
-        discovered = pinned_installation(package, json.loads(raw)) or discovered
+    if manifest:
+        # A Nix launcher selects an immutable environment. Host dpkg packages must
+        # not silently override it or make an incomplete closure look complete.
+        data = json.loads(read_bounded(manifest, 8 * MAX_OUTPUT))
+        discovered = pinned_installation(package, data)
+        if discovered is None:
+            coverage = next((row for row in data.get('toolCoverage', []) if row['package'] == package), {})
+            discovered = {'status': 'nix-unavailable', 'executables': [],
+                          'reason': coverage.get('reason', 'Package is outside the selected Nix tool profile')}
+    else:
+        discovered = discover_package(package)
     binding = (policy or {}).get('toolInstallations', {}).get(package, {})
     if discovered['status'] != 'installed' or binding.get('preferPinned') is True:
         discovered = pinned_installation(package, policy) or discovered

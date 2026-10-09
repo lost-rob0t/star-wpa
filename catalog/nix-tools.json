@@ -1,0 +1,356 @@
+{
+  "nixpkgsRevision": "e5bdc4a41d4c072fe1e3787eaa0320a384741d44",
+  "packages": [
+    {
+      "package": "aircrack-ng",
+      "attribute": "aircrack-ng",
+      "requiredExecutables": [
+        "aircrack-ng",
+        "airodump-ng",
+        "aireplay-ng"
+      ]
+    },
+    {
+      "package": "airgeddon",
+      "attribute": "airgeddon",
+      "requiredExecutables": []
+    },
+    {
+      "package": "asleap",
+      "attribute": "asleap",
+      "requiredExecutables": []
+    },
+    {
+      "package": "bettercap",
+      "attribute": "bettercap",
+      "requiredExecutables": []
+    },
+    {
+      "package": "bluelog",
+      "attribute": null,
+      "requiredExecutables": [],
+      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+    },
+    {
+      "package": "blueranger",
+      "attribute": null,
+      "requiredExecutables": [],
+      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+    },
+    {
+      "package": "bluesnarfer",
+      "attribute": "bluesnarfer",
+      "requiredExecutables": []
+    },
+    {
+      "package": "bluez",
+      "attribute": "bluez",
+      "requiredExecutables": [
+        "bluetoothctl"
+      ]
+    },
+    {
+      "package": "bluez-hcidump",
+      "attribute": null,
+      "requiredExecutables": [
+        "hcidump"
+      ],
+      "reason": "Pinned BlueZ 5.87 no longer installs hcidump; btmon is not an equivalent executable. A separately pinned legacy provider is required."
+    },
+    {
+      "package": "btscanner",
+      "attribute": null,
+      "requiredExecutables": [],
+      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+    },
+    {
+      "package": "bully",
+      "attribute": "bully",
+      "requiredExecutables": []
+    },
+    {
+      "package": "cowpatty",
+      "attribute": "cowpatty",
+      "requiredExecutables": []
+    },
+    {
+      "package": "crackle",
+      "attribute": "crackle",
+      "requiredExecutables": []
+    },
+    {
+      "package": "eaphammer",
+      "attribute": null,
+      "requiredExecutables": [],
+      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+    },
+    {
+      "package": "eapmd5pass",
+      "attribute": null,
+      "requiredExecutables": [],
+      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+    },
+    {
+      "package": "fern-wifi-cracker",
+      "attribute": null,
+      "requiredExecutables": [],
+      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+    },
+    {
+      "package": "gnuradio",
+      "attribute": "gnuradioWithOsmosdr",
+      "requiredExecutables": []
+    },
+    {
+      "package": "gpsd",
+      "attribute": "gpsd",
+      "requiredExecutables": [
+        "gpsd"
+      ]
+    },
+    {
+      "package": "gqrx-sdr",
+      "attribute": "gqrx",
+      "requiredExecutables": [
+        "gqrx"
+      ]
+    },
+    {
+      "package": "gr-gsm",
+      "attribute": null,
+      "requiredExecutables": [],
+      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+    },
+    {
+      "package": "gr-osmosdr",
+      "attribute": "gnuradioWithOsmosdr",
+      "requiredExecutables": [
+        "osmocom_fft",
+        "osmocom_siggen_nogui"
+      ],
+      "executablePrefix": "osmocom_"
+    },
+    {
+      "package": "hackrf",
+      "attribute": "hackrf",
+      "requiredExecutables": []
+    },
+    {
+      "package": "hcxdumptool",
+      "attribute": "hcxdumptool",
+      "requiredExecutables": []
+    },
+    {
+      "package": "hcxtools",
+      "attribute": "hcxtools",
+      "requiredExecutables": []
+    },
+    {
+      "package": "hostapd",
+      "attribute": "hostapd",
+      "requiredExecutables": []
+    },
+    {
+      "package": "hostapd-wpe",
+      "attribute": null,
+      "requiredExecutables": [],
+      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+    },
+    {
+      "package": "inspectrum",
+      "attribute": "inspectrum",
+      "requiredExecutables": []
+    },
+    {
+      "package": "iw",
+      "attribute": "iw",
+      "requiredExecutables": []
+    },
+    {
+      "package": "king-phisher",
+      "attribute": null,
+      "requiredExecutables": [],
+      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+    },
+    {
+      "package": "kismet",
+      "attribute": "kismet",
+      "requiredExecutables": [
+        "kismet"
+      ]
+    },
+    {
+      "package": "libfreefare-bin",
+      "attribute": "libfreefare",
+      "requiredExecutables": [
+        "mifare-desfire-info"
+      ]
+    },
+    {
+      "package": "libnfc-bin",
+      "attribute": "libnfc",
+      "requiredExecutables": [
+        "nfc-list"
+      ]
+    },
+    {
+      "package": "mdk3",
+      "attribute": "mdk3-master",
+      "requiredExecutables": [
+        "mdk3"
+      ]
+    },
+    {
+      "package": "mdk4",
+      "attribute": "mdk4",
+      "requiredExecutables": []
+    },
+    {
+      "package": "mfcuk",
+      "attribute": "mfcuk",
+      "requiredExecutables": []
+    },
+    {
+      "package": "mfoc",
+      "attribute": "mfoc",
+      "requiredExecutables": []
+    },
+    {
+      "package": "mfterm",
+      "attribute": null,
+      "requiredExecutables": [],
+      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+    },
+    {
+      "package": "multimon-ng",
+      "attribute": "multimon-ng",
+      "requiredExecutables": []
+    },
+    {
+      "package": "pixiewps",
+      "attribute": "pixiewps",
+      "requiredExecutables": []
+    },
+    {
+      "package": "reaver",
+      "attribute": "reaverwps-t6x",
+      "requiredExecutables": [
+        "reaver"
+      ]
+    },
+    {
+      "package": "redfang",
+      "attribute": "redfang",
+      "requiredExecutables": [
+        "fang"
+      ]
+    },
+    {
+      "package": "rfcat",
+      "attribute": "python3Packages.rfcat",
+      "requiredExecutables": [
+        "rfcat"
+      ]
+    },
+    {
+      "package": "rfkill",
+      "attribute": "util-linux",
+      "requiredExecutables": [
+        "rfkill"
+      ],
+      "selectExecutables": [
+        "rfkill"
+      ]
+    },
+    {
+      "package": "rtl-433",
+      "attribute": "rtl_433",
+      "requiredExecutables": [
+        "rtl_433"
+      ]
+    },
+    {
+      "package": "rtl-sdr",
+      "attribute": "rtl-sdr",
+      "requiredExecutables": []
+    },
+    {
+      "package": "rtlsdr-scanner",
+      "attribute": null,
+      "requiredExecutables": [],
+      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+    },
+    {
+      "package": "soapysdr-tools",
+      "attribute": "soapysdr",
+      "requiredExecutables": [
+        "SoapySDRUtil"
+      ]
+    },
+    {
+      "package": "tshark",
+      "attribute": "wireshark",
+      "requiredExecutables": [
+        "tshark"
+      ],
+      "selectExecutables": [
+        "tshark"
+      ]
+    },
+    {
+      "package": "ubertooth",
+      "attribute": "ubertooth",
+      "requiredExecutables": []
+    },
+    {
+      "package": "uhd-host",
+      "attribute": "uhd",
+      "requiredExecutables": [
+        "uhd_find_devices"
+      ]
+    },
+    {
+      "package": "wifi-honey",
+      "attribute": null,
+      "requiredExecutables": [],
+      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+    },
+    {
+      "package": "wifiphisher",
+      "attribute": null,
+      "requiredExecutables": [],
+      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+    },
+    {
+      "package": "wifite",
+      "attribute": "wifite2",
+      "requiredExecutables": [
+        "wifite"
+      ]
+    },
+    {
+      "package": "wireless-tools",
+      "attribute": "wirelesstools",
+      "requiredExecutables": [
+        "iwconfig"
+      ]
+    },
+    {
+      "package": "wireshark",
+      "attribute": "wireshark",
+      "requiredExecutables": []
+    },
+    {
+      "package": "wpasupplicant",
+      "attribute": "wpa_supplicant",
+      "requiredExecutables": [
+        "wpa_supplicant"
+      ]
+    },
+    {
+      "package": "yersinia",
+      "attribute": "yersinia",
+      "requiredExecutables": []
+    }
+  ]
+}
