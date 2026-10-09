@@ -25,6 +25,11 @@ nix run . -- listener --request tests/fixtures/listener.json
 nix run .#native -- listener "$PWD/tests/fixtures/listener.json"
 ```
 
+The [Nix runtime profiles and exact dependency coverage](docs/NIX-RUNTIME.md) explain
+the bundled commands, the larger `.#wireless` profile, and explicitly unsupported
+catalog tools. Nix supplies user-space dependencies; host drivers and permissions
+remain separate.
+
 The following direct host setup is also supported:
 
 Requires Python 3.11+, SBCL, Bordeaux Threads and Node.js for view tests. On Debian/Ubuntu install `sbcl cl-bordeaux-threads`. Radio tools and GPSD/Kismet are required only for their live effects.

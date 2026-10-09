@@ -17,5 +17,13 @@ jobs:
           nix run . -- tool-wifiphisher --request tests/fixtures/tool-discovery.json > /tmp/star-wpa-adapter.json
           nix run .#native -- tool-wifiphisher "$PWD/tests/fixtures/tool-discovery.json" > /tmp/star-wpa-native.json
           nix develop --command python3 -c 'import json; [json.load(open(p))[0]["eventKind"] == "wireless-tool-discovery" or (_ for _ in ()).throw(AssertionError(p)) for p in ["/tmp/star-wpa-adapter.json", "/tmp/star-wpa-native.json"]]'
+      - name: Installed Nix shell and packaged command smoke
+        run: |
+          core=$(nix build .#star-wpa --no-link --print-out-paths)
+          nix develop --command python3 scripts/check-installed-cli.py --installed --bin-directory "$core/bin"
+          wireless=$(nix build .#wireless --no-link --print-out-paths)
+          nix develop .#wireless --command python3 scripts/check-installed-cli.py --installed --bin-directory "$wireless/bin"
+          nix run .#wireless-native -- tool-aircrack-ng "$PWD/tests/fixtures/tool-discovery.json" > /tmp/star-wpa-wireless-native.json
+          nix develop --command python3 -c 'import json; d=json.load(open("/tmp/star-wpa-wireless-native.json"))[0]["extensions"]["org.starintel/wpa@1"]; assert d["installation"] == "nix-pinned" and d["executables"]'
       - name: Real disposable CouchDB proof
         run: nix develop --command python3 scripts/live-couchdb-proof.py
