@@ -27,9 +27,10 @@
     },
     {
       "package": "bluelog",
-      "attribute": null,
-      "requiredExecutables": [],
-      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+      "attribute": "starWpa.bluelog",
+      "requiredExecutables": [
+        "bluelog"
+      ]
     },
     {
       "package": "blueranger",
@@ -51,11 +52,10 @@
     },
     {
       "package": "bluez-hcidump",
-      "attribute": null,
+      "attribute": "starWpa.bluez-hcidump",
       "requiredExecutables": [
         "hcidump"
-      ],
-      "reason": "Pinned BlueZ 5.87 no longer installs hcidump; btmon is not an equivalent executable. A separately pinned legacy provider is required."
+      ]
     },
     {
       "package": "btscanner",
@@ -86,9 +86,10 @@
     },
     {
       "package": "eapmd5pass",
-      "attribute": null,
-      "requiredExecutables": [],
-      "reason": "No packaged provider found in the pinned nixpkgs source; a separately reviewed, source-and-hash-pinned derivation is required."
+      "attribute": "starWpa.eapmd5pass",
+      "requiredExecutables": [
+        "eapmd5pass"
+      ]
     },
     {
       "package": "fern-wifi-cracker",
