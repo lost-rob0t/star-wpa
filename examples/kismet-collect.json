@@ -1,0 +1,7 @@
+{
+  "dataset": "wireless-lab",
+  "receiverId": "kismet-local",
+  "operation": "collect",
+  "url": "http://127.0.0.1:2501/devices/last-time/-60/devices.json",
+  "timeoutSeconds": 10
+}

@@ -1,0 +1,4 @@
+{
+  "kismetTokenUrls": ["http://127.0.0.1:2501/devices/last-time/-60/devices.json"],
+  "kismetTokenAuth": "cookie"
+}

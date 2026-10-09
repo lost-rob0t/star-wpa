@@ -1,0 +1,70 @@
+:PROPERTIES:
+:ID: star-wpa-kismet-policy-20261009
+:END:
+#+title: Kismet deployment policy and collection integration
+#+description: Trace operator policy loading and verify credentialed collection through controlled HTTP fixtures.
+#+status: IMPLEMENTED
+#+filetags: :rage:design:wireless:
+
+* Approval Table
+
+| Approval area | Required authority | State | Evidence required | Evidence reference |
+|---------------+--------------------+-------+-------------------+--------------------|
+| Configuration, examples and tests | Project owner | APPROVED | Explicit task instruction | User: check configuration, update examples and integration tests |
+| Live deployment mutation | Local operator | NOT APPLICABLE | Accessible deployment | No deployment session or operator configuration is available |
+| Merge | Project owner | PENDING | Explicit merge instruction | Changes will be proposed for review |
+
+* Verified Findings
+
+At main 78696e2a05a950791345df697810b42e39a91e50, star_wpa/__main__.py loads STAR_WPA_POLICY_FILE before dispatch. lisp/actors.lisp launches that CLI without replacing the inherited environment. kismet_devices uses only STAR_WPA_KISMET_TOKEN, exact kismetTokenUrls membership and no redirects.
+
+The current lost-rob0t/dotfiles master at 76d0b59198c2a952b9af2cdaf1aa2d7e7c99d4d7 contains no case-insensitive Kismet, star-wpa, STAR_WPA_ or port 2501 matches. This is repository evidence, not deployment evidence. This workspace has no STAR_WPA_ environment settings or SSH configuration.
+
+Kismet's official login documentation retrieved 2026-10-09 specifies a KISMET cookie or URI parameter for API tokens: https://www.kismetwireless.net/docs/api/login/. Star-WPA currently sends only a Bearer header. Direct Kismet compatibility therefore needs a cookie mode; preserve Bearer as the existing default for gateways. Never put tokens into URLs.
+
+* Design
+
+Add operator-local kismetTokenAuth with bearer (default) and cookie modes. Requests cannot override it. Cookie values must satisfy RFC 6265 cookie-octet constraints before transport. Both modes retain exact destination checks and redirect rejection. Add matching token-free example request/policy files and deployment guidance. Exercise the actual CLI subprocess against loopback servers with bounded waits; test missing/malformed policy, exact URL mismatches, request policy injection, secret selection, auth modes, redirects and canonical output.
+
+* Unresolved Questions
+
+The actual deployed policy path, service/host, Kismet version and final device-array URL remain unknown. No real Kismet collection is claimed. Native actors and Nix checks must be verified through maintained hosted checks if local Nix is unavailable.
+
+* Evaluation
+
+Record host and hosted validation only after observing results. Loopback HTTP tests simulate the API contract; they do not validate RF capture, a real Kismet process, authentication provisioning or deployment configuration.
+
+* Changelog
+
+| Date | Change | Author or actor | Evidence |
+|------+--------+-----------------+----------|
+| 2026-10-09 | Deployment trace and fixture validation design | Codex | Current source, dotfiles checkout and official Kismet docs |
+
+* IMPLEMENTED RAGE Execution Record
+:PROPERTIES:
+:STATUS_EVENT_ID: 88a1a755-bf67-4147-a4bd-0c0722e094b4
+:RECORDED_AT: 2026-10-09T13:29:31-04:00
+:END:
+
+** Summary
+Add deployment-local Kismet cookie authentication, exact destination configuration examples and real CLI/HTTP integration coverage.
+
+** Files
+- star_wpa/adapters.py
+- tests/test_kismet_collection.py
+- docs/KISMET-COLLECTION.md
+- examples/kismet-policy.json
+- examples/kismet-collect.json
+- README.md
+
+** Tests
+- 51 maintained host Python tests passed; 10 CLI/HTTP integration tests include both auth modes and 20 redirect combinations
+- Offline StarIntel 0.10.1 schema lock, generated views, Node view checks and 57 tool actor declarations passed
+- Python compilation and structure synchronization passed
+
+** Commits
+- None
+
+** Notes
+- Local nix flake check could not start: nix is not installed; hosted checks remain pending.
+- No actual Kismet deployment is accessible. No deployment config was mutated and live collection remains unverified.
