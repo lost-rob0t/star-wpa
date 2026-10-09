@@ -16,11 +16,15 @@ jobs:
         with:
           python-version: '3.x'
       - name: Install wireless adapter dependencies
-        run: python3 -m pip install -e .
+        run: python3 -m pip install -e . "setuptools>=68" wheel
       - name: Compile scripts
         run: python3 -m py_compile scripts/*.py
       - name: Unit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Check generated actor and shell-command coverage
+        run: python3 scripts/build-tool-actors.py --check
+      - name: Prove installed standalone commands
+        run: python3 scripts/check-installed-cli.py
       - name: Synchronize structure
         run: python3 scripts/sync.py
       - name: Check synchronization
