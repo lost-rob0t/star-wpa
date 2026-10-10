@@ -69,7 +69,7 @@ class KismetCollectionTests(unittest.TestCase):
         server.server_close()
         self.assertFalse(thread.is_alive())
 
-    def collect(self, *, request=None, policy=None, token=TOKEN, policy_text=None):
+    def collect(self, *, request=None, policy=None, token=TOKEN, policy_text=None, proxy=None):
         directory = Path(self.directory.name)
         request_path = directory / "request.json"
         request_path.write_text(json.dumps(self.request if request is None else request))
@@ -79,6 +79,8 @@ class KismetCollectionTests(unittest.TestCase):
             env.pop(key, None)
         env.update(NO_PROXY="127.0.0.1,localhost", no_proxy="127.0.0.1,localhost",
                    OTHER_SECRET="synthetic-unrelated-secret")
+        if proxy is not None:
+            env.update(HTTP_PROXY=proxy, http_proxy=proxy, NO_PROXY="", no_proxy="")
         if token is not None:
             env["STAR_WPA_KISMET_TOKEN"] = token
         if policy is not None or policy_text is not None:
@@ -179,6 +181,25 @@ class KismetCollectionTests(unittest.TestCase):
                         self.assertEqual(result.stderr, "star-wpa adapter failed: HTTPError\n")
                         expected = (path, "Bearer " + TOKEN, None) if auth == "bearer" else (path, None, "KISMET=" + TOKEN)
                         self.assertEqual(self.seen, [expected])
+
+    def test_authenticated_plaintext_remote_http_rejected_before_io(self):
+        url = "http://192.0.2.1:2501" + DEVICE_PATH
+        for auth in ("bearer", "cookie"):
+            with self.subTest(auth=auth):
+                request = dict(self.request, url=url)
+                policy = {"kismetTokenUrls": [url], "kismetTokenAuth": auth}
+                self.assert_denied(self.collect(request=request, policy=policy))
+
+    def test_tokened_loopback_bypasses_untrusted_environment_proxy(self):
+        policy = {"kismetTokenUrls": [self.url], "kismetTokenAuth": "cookie"}
+        self.assert_collected(self.collect(policy=policy, proxy=self.sink))
+        self.assertEqual(self.seen, [(DEVICE_PATH, None, "KISMET=" + TOKEN)])
+
+    def test_localhost_hostname_cannot_bypass_plaintext_protection(self):
+        url = "http://localhost:2501" + DEVICE_PATH
+        policy = {"kismetTokenUrls": [url], "kismetTokenAuth": "cookie"}
+        request = dict(self.request, url=url)
+        self.assert_denied(self.collect(request=request, policy=policy))
 
     def test_unset_token_collects_without_authentication_or_allowlist(self):
         self.assert_collected(self.collect(token=None))

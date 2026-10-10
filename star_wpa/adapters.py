@@ -1,6 +1,7 @@
 """External effects: bounded protocols and exact argv; no actor supervisor here."""
 import json
 import os
+from ipaddress import ip_address
 import re
 import signal
 import socket
@@ -72,6 +73,15 @@ def kismet_devices(request, policy=None):
     parsed = urlparse(url)
     if parsed.scheme not in ("http", "https") or not parsed.netloc or parsed.username or parsed.password or parsed.fragment:
         raise ValueError("Kismet URL must be HTTP(S), without embedded credentials")
+    # A policy allowlist never authorizes plaintext remote credential transit.
+    token_present = bool(os.environ.get("STAR_WPA_KISMET_TOKEN"))
+    if token_present and parsed.scheme == "http":
+        try:
+            is_loopback = ip_address(parsed.hostname or "").is_loopback
+        except ValueError:
+            is_loopback = False
+        if not is_loopback:
+            raise PermissionError("authenticated Kismet requires HTTPS or numeric loopback")
     # Operator supplies a concrete Kismet JSON endpoint; auth stays in environment.
     headers = {"Accept": "application/json"}
     env_name = "STAR_WPA_KISMET_TOKEN"
@@ -92,7 +102,8 @@ def kismet_devices(request, policy=None):
             headers["Cookie"] = "KISMET=" + token
         else:
             raise ValueError("unknown deployment Kismet token authentication")
-    with open_http(Request(url, headers=headers), timeout=duration(request)) as response:
+    with open_http(Request(url, headers=headers), timeout=duration(request),
+                   direct=token_present and parsed.scheme == "http") as response:
         raw = response.read(MAX_BYTES + 1)
     if len(raw) > MAX_BYTES:
         raise ValueError("Kismet response exceeds byte limit")
