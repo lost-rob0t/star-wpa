@@ -102,7 +102,7 @@ class CouchDB:
                         raise ValueError('conflicting immutable wireless evidence')
                     if before.get('dataset') != doc['dataset'] or before.get('dtype') != doc['dtype']:
                         raise ValueError('canonical identity conflict')
-                    if doc['dtype'] in ('wireless-network', 'wireless-station'):
+                    if doc['dtype'] in ('wireless-network', 'wireless-station', 'network-device'):
                         value = dict(before if before.get('lastSeen', 0) > doc.get('lastSeen', 0) else doc)
                         first = min(before.get('firstSeen', 2**63), doc.get('firstSeen', 2**63))
                         if first != 2**63:
