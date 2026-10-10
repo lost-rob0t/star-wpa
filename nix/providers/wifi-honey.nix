@@ -14,8 +14,10 @@ stdenvNoCC.mkDerivation {
   version = "1.0";
 
   src = fetchurl {
-    url = "https://digi.ninja/files/wifi_honey_1.0.tar.bz2";
-    hash = "sha256-Qh7E+gHhRG9CCUjDVs+3Ur4st2jc622DSkRWRt4AK3E=";
+    # Kali's published upstream 1.0 source (sha256 verified against its source .dsc).
+    # digi.ninja's original tarball endpoint returns HTTP 403 in hosted Nix builds.
+    url = "https://http.kali.org/kali/pool/main/w/wifi-honey/wifi-honey_1.0.orig.tar.gz";
+    hash = "sha256-b+FuO+OrJNRgOUFmoUFcn3utcfPo69LzXdfzeUqNY+Q=";
   };
 
   patches = [ ./wifi-honey-runtime.patch ];
