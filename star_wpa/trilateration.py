@@ -30,6 +30,47 @@ def ranges(data, model):
     return distance
 
 
+def farthest_baseline(samples):
+    """Exact planar receiver diameter in O(n log n), not quadratic pair enumeration."""
+    points = sorted({(row[0], row[1]) for row in samples})
+    if len(points) < 2:
+        return 0.0
+
+    def cross(origin, a, b):
+        return ((a[0] - origin[0]) * (b[1] - origin[1])
+                - (a[1] - origin[1]) * (b[0] - origin[0]))
+
+    lower = []
+    for candidate in points:
+        while len(lower) >= 2 and cross(lower[-2], lower[-1], candidate) <= 0:
+            lower.pop()
+        lower.append(candidate)
+    upper = []
+    for candidate in reversed(points):
+        while len(upper) >= 2 and cross(upper[-2], upper[-1], candidate) <= 0:
+            upper.pop()
+        upper.append(candidate)
+
+    hull = lower[:-1] + upper[:-1]
+    if len(hull) == 2:
+        return math.hypot(hull[0][0] - hull[1][0], hull[0][1] - hull[1][1])
+
+    diameter = 0.0
+    opposite = 1
+    for index, current in enumerate(hull):
+        next_vertex = hull[(index + 1) % len(hull)]
+        while cross(current, next_vertex, hull[(opposite + 1) % len(hull)]) > \
+                cross(current, next_vertex, hull[opposite]):
+            opposite = (opposite + 1) % len(hull)
+        far = hull[opposite]
+        diameter = max(
+            diameter,
+            math.hypot(current[0] - far[0], current[1] - far[1]),
+            math.hypot(next_vertex[0] - far[0], next_vertex[1] - far[1]),
+        )
+    return diameter
+
+
 def fit(events, model, max_baseline):
     lat0 = sum(e["extensions"][NS]["latitude"] for e in events) / len(events)
     lon0 = events[0]["extensions"][NS]["longitude"]
@@ -48,7 +89,7 @@ def fit(events, model, max_baseline):
         if sigma <= 0:
             raise ValueError("range uncertainty must be positive")
         samples.append((x, y, ranges(data, model), sigma))
-    baseline = max(math.hypot(a[0] - b[0], a[1] - b[1]) for a in samples for b in samples)
+    baseline = farthest_baseline(samples)
     if baseline > max_baseline:
         raise ValueError("receiver baseline exceeds local-plane limit")
     x0, y0, r0, _ = samples[0]

@@ -132,3 +132,44 @@ token environment or SSH configuration. Therefore no deployed policy was
 edited, no real Kismet process was tested, and the actual deployed endpoint,
 policy path and service remain unverified. Official API documentation was
 retrieved on 2026-10-09; the deployed Kismet version still needs checking.
+
+
+## Mocked CI versus deployed acceptance
+
+Development does **not** wait for RF hardware or a reachable deployment. The
+mocked lane runs the same maintained adapter and the same live-proof wrapper
+against a local HTTP fixture with a synthetic token:
+
+```bash
+python3 -m unittest tests.test_live_kismet_proof -v
+python3 -m unittest discover -s tests -p 'test_kismet_collection.py' -v
+```
+
+That lane is expected to run in CI. It proves request/policy handling,
+credential destination controls, HTTP behavior, canonical StarIntel 0.10.1
+validation, and sanitized reporting. It does not prove physical RF reception or
+a particular deployed Kismet instance.
+
+The deployed lane is intentionally separate and opt-in:
+
+```bash
+export STAR_WPA_POLICY_FILE=/operator/local/star-wpa-policy.json
+# Inject STAR_WPA_KISMET_TOKEN through the deployment secret mechanism.
+python3 scripts/live-kismet-proof.py \
+  --request /operator/local/kismet-collect.json
+```
+
+The script prints only document counts, dtypes, dataset names and schema
+versions. To retain the canonical document batch for a subsequent operator
+controlled CouchDB test, request a new private file explicitly:
+
+```bash
+python3 scripts/live-kismet-proof.py \
+  --request /operator/local/kismet-collect.json \
+  --documents-out /operator/local/kismet-documents.json
+```
+
+The output file is created with mode 0600 and is never overwritten. A successful
+empty response proves API connectivity only. Hardware/RF acceptance requires an
+expected observation from the deployed collector and must be reported
+separately from the mocked CI result.
