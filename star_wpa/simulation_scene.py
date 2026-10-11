@@ -36,9 +36,17 @@ def _text(value):
 
 def _https(value):
     _text(value)
-    parsed = urlsplit(value)
-    if parsed.scheme != 'https' or not parsed.hostname or parsed.username or parsed.password or parsed.query or parsed.fragment:
-        raise ValueError('source URL must be HTTPS without credentials, query, or fragment')
+    try:
+        parsed = urlsplit(value)
+        valid = (not any(char.isspace() or ord(char) < 32 or ord(char) == 127 for char in value)
+                 and parsed.scheme == 'https' and parsed.hostname
+                 and parsed.username is None and parsed.password is None
+                 and not parsed.query and not parsed.fragment
+                 and (parsed.port is None or 1 <= parsed.port <= 65535))
+    except ValueError:
+        valid = False
+    if not valid:
+        raise ValueError('source URL must be valid HTTPS without credentials, whitespace, query, or fragment')
 
 
 def _cross(a, b, c):
@@ -64,7 +72,9 @@ def _validate_ring(ring, width, height):
     if ring[0] != ring[-1] or len({tuple(p) for p in ring[:-1]}) != len(ring) - 1:
         raise ValueError('polygon must close with otherwise distinct vertices')
     edges = list(zip(ring, ring[1:]))
-    area = sum(a[0] * b[1] - a[1] * b[0] for a, b in edges) / 2
+    # Translate before summing: global-coordinate shoelace terms can cancel at
+    # large offsets even when the small polygon's area is above the threshold.
+    area = math.fsum(_cross(ring[0], a, b) for a, b in edges) / 2
     if abs(area) < 0.000001:
         raise ValueError('degenerate polygon')
     for i, (a, b) in enumerate(edges):

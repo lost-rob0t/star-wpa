@@ -60,6 +60,21 @@ class SceneTests(unittest.TestCase):
             scene['features'][0]['polygonMeters'] = points
             self.assertEqual(validate_scene(scene), scene)
 
+    def test_small_polygon_area_is_invariant_to_large_translation(self):
+        for origin in (0, 9999):
+            scene = synthetic_scene('field', width_meters=10000, height_meters=10000)
+            for side, accepted in ((0.001001, True), (0.000999, False)):
+                a, b = origin, origin + side
+                ring = [[a,a], [b,a], [b,b], [a,b], [a,a]]
+                for points in (ring, list(reversed(ring))):
+                    scene['features'][0]['polygonMeters'] = points
+                    with self.subTest(origin=origin, side=side, points=points):
+                        if accepted:
+                            self.assertEqual(validate_scene(scene), scene)
+                        else:
+                            with self.assertRaises(ValueError):
+                                validate_scene(scene)
+
     def test_bad_rings_fail_including_nonzero_area_self_intersection(self):
         scene = synthetic_scene('field', width_meters=10, height_meters=10)
         rings = [
@@ -108,7 +123,10 @@ class SceneTests(unittest.TestCase):
         self.assertEqual(source['features'][0]['polygonMeters'][0][0], 0)
         for change in ({'sourceUrl':'https://user:secret@example.org/data'}, {'sourceUrl':'http://example.org/data'},
                        {'licenseUrl':''}, {'sourceSha256':'x'*64}, {'retrievedDate':'2026-02-30'},
-                       {'verification':'verified'}, {'sourceUrl':'https://example.org/data?token=private'}):
+                       {'verification':'verified'}, {'sourceUrl':'https://example.org/data?token=private'},
+                       {'sourceUrl':'https://example.org:bad/data'}, {'sourceUrl':'https://example.org:99999/data'},
+                       {'sourceUrl':'https://@example.org/data'}, {'sourceUrl':'https://exam ple.org/data'},
+                       {'sourceUrl':'https://example.org/\nprivate'}, {'sourceUrl':'https://[invalid/data'}):
             with self.subTest(change=change), self.assertRaises(ValueError):
                 adapt_open_geometry(projected, dict(provenance, **change), scene_type='field', seed=7)
         with self.assertRaises(ValueError):

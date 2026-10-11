@@ -2,7 +2,9 @@
 import copy
 import json
 import unittest
+from fractions import Fraction
 from pathlib import Path
+import random
 
 from star_wpa.simulation_calibration import FORMAT, fit_synthetic_calibration
 
@@ -31,6 +33,22 @@ class CalibrationTests(unittest.TestCase):
         self.assertEqual(result['referenceSignalDbm'], -40)
         self.assertEqual(result['pathLossExponent'], 2)
         self.assertEqual(result['residualRmseDb'], 1)
+
+    def test_fits_match_an_exact_rational_normal_equation_oracle(self):
+        # An independent uncentered closed form with exact integer arithmetic,
+        # unlike the production centered floating-point covariance calculation.
+        rng = random.Random(20403)
+        for count in range(4, 36):
+            xs = [0, 2, 5] + [rng.randrange(6) for _ in range(count - 3)]
+            ys = [-30 - 15 * x + rng.randrange(-3, 4) for x in xs]
+            sx, sy, sxx, sxy = sum(xs), sum(ys), sum(x*x for x in xs), sum(x*y for x,y in zip(xs,ys))
+            denominator = count * sxx - sx * sx
+            intercept = Fraction(sy * sxx - sx * sxy, denominator)
+            slope = Fraction(count * sxy - sx * sy, denominator)
+            result = fit_synthetic_calibration(fixture(ys, [10**x for x in xs]))['fits'][0]
+            with self.subTest(count=count):
+                self.assertAlmostEqual(result['referenceSignalDbm'], float(intercept), places=11)
+                self.assertAlmostEqual(result['pathLossExponent'], float(-slope / 10), places=12)
 
     def test_frequencies_are_fit_separately_not_pooled_by_band(self):
         request = fixture()

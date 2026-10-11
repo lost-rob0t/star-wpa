@@ -3,8 +3,7 @@
 These Python interfaces prepare local inputs for a future bridge to the
 producer-owned Prolog coverage engine. They do not run that engine, add an
 `sa-*` command, simulate packets, implement RF reception, or consume private
-WiGLE databases. No engine source is duplicated here. PR #17 remains the
-separate integration branch; this work is an isolated local candidate for #16.
+WiGLE databases. No engine source is duplicated here.
 
 ## Original synthetic scenes
 
@@ -28,7 +27,8 @@ value. The original Prolog model remains responsible for reception assumptions.
 The geometry contract contains `format`, `sceneType`, `seed`, `extentMeters`,
 `features`, and `provenance`. Features contain a unique `id`, `kind` (`building`,
 `road`, or `open-area`), a `material` label, and `polygonMeters`. Polygon rings
-must close, have otherwise distinct vertices, be simple, have nonzero area,
+must close, have otherwise distinct vertices, be simple, have area of at least
+0.000001 square metres,
 and lie within the scene extent. Clockwise, counterclockwise, and concave rings
 are accepted. Holes, multipolygons, altitude, trajectories, and geodetic
 coordinates are outside this first contract. Provider adapters may split
@@ -69,8 +69,8 @@ upstream provider's already projected local-metre geometry:
 - `coordinateTransform` describes the source CRS, chosen local projection,
   origin, transform/tool version, and accuracy limitations. This first boundary
   requires a nonempty declaration, not a machine-verifiable projection record.
-- Source and license URLs must use HTTPS without credentials, query strings,
-  or fragments. Nothing is fetched. Preserve a stable dataset landing URL;
+- Source and license URLs must use valid HTTPS without credentials, whitespace,
+  query strings, or fragments. Nothing is fetched. Preserve a stable dataset landing URL;
   authenticated downloads and request details stay outside this contract.
 
 The result always records `kind: "public-open"` and
@@ -140,8 +140,7 @@ assert fit['residualRmseDb'] == 0
 
 The producer owns Prolog source, packet generation, elapsed-time schedules,
 paired seeds, device/packet coverage metrics, and Monte Carlo uncertainty.
-Those are not reimplemented here. Source publication/handoff remains pending;
-no further Library download attempts are made.
+Those are not reimplemented here. The bridge to that engine is not yet implemented.
 
 The executor's future bridge must translate this geometry and explicit RF
 assumptions to the reviewed Prolog interface, enforce public-source verification,
