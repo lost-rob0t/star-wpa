@@ -22,9 +22,9 @@ python -m star_wpa.wigle_sqlite /private/path/completed-backup.sqlite \
   --max-rows 1000000 --max-bytes 536870912 --max-seconds 30
 ```
 
-The CLI prints only observation counts (total, external, and by network radio
-code), after a complete successful read. Failure prints a fixed diagnostic to
-stderr with no input paths, row values or SQL error text. These local counts are
+The CLI prints only observation counts (total, external, unknown signal, and by
+network radio code), after a complete successful read. Failure prints a fixed
+diagnostic to stderr with no input paths, row values or SQL error text. These local counts are
 still private derivatives, not an approved public export.
 
 ```python
@@ -51,6 +51,10 @@ Primary sources were inspected on 2026-10-11 at official WiGLE Android commit
   Android `Location.getTime()`, and checkpoints before copying a database backup.
 - [NetworkType](https://github.com/wiglenet/wigle-wifi-wardriving/blob/c7b87114f9c4d8a269673fedacc675c5b3cf94be/wiglewifiwardriving/src/main/java/net/wigle/wigleandroid/model/NetworkType.java)
   maps W/G/C/L/D/N/B/E/F to Wi-Fi/GSM/CDMA/LTE/WCDMA/NR/Bluetooth/BLE/NFC.
+- [BluetoothReceiver](https://github.com/wiglenet/wigle-wifi-wardriving/blob/c7b87114f9c4d8a269673fedacc675c5b3cf94be/wiglewifiwardriving/src/main/java/net/wigle/wigleandroid/listener/BluetoothReceiver.java#L484-L550)
+  defaults missing discovery RSSI to `Short.MIN_VALUE` (-32768). It can reach
+  `location.level` unchanged through `addOrUpdateBt` and the
+  [observation writer](https://github.com/wiglenet/wigle-wifi-wardriving/blob/c7b87114f9c4d8a269673fedacc675c5b3cf94be/wiglewifiwardriving/src/main/java/net/wigle/wigleandroid/db/DatabaseHelper.java#L1400-L1448).
 - [ObservationUploader](https://github.com/wiglenet/wigle-wifi-wardriving/blob/c7b87114f9c4d8a269673fedacc675c5b3cf94be/wiglewifiwardriving/src/main/java/net/wigle/wigleandroid/background/ObservationUploader.java)
   writes the separate version 1.6 CSV export with 14 columns and UTC timestamps.
 
@@ -63,7 +67,7 @@ WiGLE release is supported. No database version number is guessed.
 
 | Source | Required declared types | Reader meaning |
 | --- | --- | --- |
-| `location._id`, `level`, `external` | INTEGER | Source observation ID, RSSI dBm, external flag |
+| `location._id`, `level`, `external` | INTEGER | Source observation ID, raw signal level (including missing sentinel), external flag |
 | `location.bssid` | TEXT | Observed address; not a physical-device identity |
 | `location.lat`, `lon`, `altitude` | DOUBLE | Receiver location/fix values, not transmitter coordinates |
 | `location.accuracy` | FLOAT | Source receiver-location accuracy, not RSSI/range uncertainty |
@@ -79,6 +83,18 @@ validated as MAC syntax; other radio addresses remain bounded opaque strings.
 Zero coordinates and zero timestamps are preserved, not treated as missing.
 No `route` records, network best/last coordinates, receiver identity or computed
 distance are returned. Reused location-fix times need not be exact scan times.
+
+`source_signal_level` preserves the stored integer exactly. For Bluetooth/BLE
+summary codes B/E, the known missing-RSSI sentinel -32768 produces
+`signal_dbm=None`. The row still contributes to total/radio counts, and the CLI
+increments `unknownSignalObservations` without printing the raw value. Other
+accepted signal values remain bounded to -200..100 dBm; the sentinel is not
+accepted for unrelated radios, and neighboring out-of-range values are rejected.
+The B/E handling also covers a Bluetooth summary subsequently updated to BLE.
+Consumers must exclude unknown signals from signal statistics or model fitting;
+never substitute zero or the raw sentinel. Numeric values inside the accepted
+range may still contain upstream fallback values; this reader does not certify
+that every numeric value is a measured or calibrated signal.
 
 Observation counts are not packet counts or emission rates. Address counts do
 not guarantee distinct physical devices. Radio calibration needs separately
@@ -134,6 +150,6 @@ reports Python allocations only, excluding SQLite native memory and filesystem
 cache. It does not measure Prolog coverage, radio capture or real backup quality.
 
 Measured locally with Python 3.12.14, SQLite 3.53.1 and x86_64: a 5,787,648-byte,
-100,000-row synthetic backup took 399.950 ms median CPU and 399.964 ms median wall
+100,000-row synthetic backup took 407.005 ms median CPU and 407.425 ms median wall
 time over five runs. The separate memory pass peaked at 2,109,736 traced Python
 bytes. This is an example measurement, not a CI threshold or portable guarantee.

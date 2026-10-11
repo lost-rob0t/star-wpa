@@ -45,7 +45,7 @@ class Limits:
 class Reading:
     observation_id: int
     address: str
-    signal_dbm: int
+    signal_dbm: int | None
     latitude: float
     longitude: float
     altitude_m: float
@@ -56,6 +56,7 @@ class Reading:
     network_name: str
     network_frequency: int
     network_capabilities: str
+    source_signal_level: int
 
 
 _MAC = re.compile(r"(?:[0-9a-fA-F]{2}:){5}[0-9a-fA-F]{2}\Z")
@@ -153,6 +154,14 @@ def _text(value, limit):
     return value
 
 
+def _signal_dbm(value, radio):
+    # WiGLE BluetoothReceiver uses Short.MIN_VALUE for missing EXTRA_RSSI.
+    # Network summaries can later change from BT (B) to BLE (E).
+    if type(value) is int and value == -32768 and radio in {"B", "E"}:
+        return None
+    return _integer(value, -200, 100)
+
+
 def _reading(row):
     ident, address, signal, lat, lon, altitude, accuracy, at, external, radio, name, frequency, capabilities = row
     if radio is None:
@@ -162,10 +171,10 @@ def _reading(row):
     address = _text(address, 128)
     if not address or (radio in {"W", "B", "E"} and not _MAC.fullmatch(address)):
         raise WigleImportError("Invalid source address")
-    return Reading(_integer(ident, 1, 2**63 - 1), address, _integer(signal, -200, 100),
+    return Reading(_integer(ident, 1, 2**63 - 1), address, _signal_dbm(signal, radio),
                    _number(lat, -90, 90), _number(lon, -180, 180), _number(altitude, -100_000, 100_000_000),
                    _number(accuracy, 0, 100_000_000), _integer(at, 0, 2**63 - 1), bool(_integer(external, 0, 1)),
-                   radio, _text(name, 4096), _integer(frequency, 0, 100_000_000), _text(capabilities, 4096))
+                   radio, _text(name, 4096), _integer(frequency, 0, 100_000_000), _text(capabilities, 4096), signal)
 
 
 def _rows(db, limits, deadline):
@@ -245,14 +254,16 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         limits = Limits(max_rows=args.max_rows, max_bytes=args.max_bytes, max_seconds=args.max_seconds)
-        total, external, codes = 0, 0, {}
+        total, external, unknown_signal, codes = 0, 0, 0, {}
         with read_backup(args.source, limits=limits) as rows:
             for row in rows:
                 total += 1
                 external += row.external
+                unknown_signal += row.signal_dbm is None
                 codes[row.network_radio_code] = codes.get(row.network_radio_code, 0) + 1
         print(json.dumps({"format": "star-wpa-wigle-sqlite-summary-v1", "observations": total,
-                          "externalObservations": external, "observationsByNetworkRadioCode": codes}, sort_keys=True))
+                          "externalObservations": external, "unknownSignalObservations": unknown_signal,
+                          "observationsByNetworkRadioCode": codes}, sort_keys=True))
     except WigleImportError as error:
         print("WiGLE import failed: " + str(error), file=sys.stderr)
         return 1

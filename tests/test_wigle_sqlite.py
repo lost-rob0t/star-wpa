@@ -59,6 +59,7 @@ class BackupTests(unittest.TestCase):
         self.assertEqual([r.observed_at_ms for r in rows], [1700000000000, 1700000000001, 1700000000002])
         self.assertEqual(len({r.address for r in rows}), 1)
         self.assertEqual([r.signal_dbm for r in rows], [-40, -41, -42])
+        self.assertEqual([r.source_signal_level for r in rows], [-40, -41, -42])
         self.assertEqual([r.external for r in rows], [False, True, False])
         self.assertEqual((rows[0].latitude, rows[0].longitude), (0, 0))
         self.assertEqual((rows[0].altitude_m, rows[0].accuracy_m), (12.5, 3.25))
@@ -190,6 +191,36 @@ class BackupTests(unittest.TestCase):
         self.sql("UPDATE network SET type='L', frequency=12345")
         self.assertEqual(self.read()[0].network_frequency, 12345)
 
+    def test_bluetooth_missing_rssi_preserves_row_without_inventing_dbm(self):
+        # Classic discovery defaults to Short.MIN_VALUE; the network summary
+        # can subsequently be marked BLE. Both persisted summary codes occur.
+        self.sql("UPDATE location SET level=-32768 WHERE _id=2")
+        for radio in ("B", "E"):
+            self.sql("UPDATE network SET type=?", (radio,))
+            with self.subTest(radio=radio):
+                rows = self.read(limits=Limits(batch_size=1))
+                self.assertEqual([r.observation_id for r in rows], [1, 2, 3])
+                self.assertEqual([r.signal_dbm for r in rows], [-40, None, -42])
+                self.assertEqual([r.source_signal_level for r in rows], [-40, -32768, -42])
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with redirect_stdout(stdout), redirect_stderr(stderr):
+                    self.assertEqual(main([str(self.path)]), 0)
+                result = json.loads(stdout.getvalue())
+                self.assertEqual(result["observations"], 3)
+                self.assertEqual(result["unknownSignalObservations"], 1)
+                self.assertEqual(result["observationsByNetworkRadioCode"], {radio: 3})
+                self.assertEqual(stderr.getvalue(), "")
+                self.assertNotIn("-32768", stdout.getvalue())
+
+    def test_missing_rssi_is_only_the_known_bluetooth_sentinel(self):
+        for radio, level in (("W", -32768), ("G", -32768), ("F", -32768),
+                             ("B", -32767), ("E", -32769), ("B", 32767),
+                             ("E", -201), ("E", 101)):
+            self.sql("UPDATE network SET type=?", (radio,))
+            self.sql("UPDATE location SET level=? WHERE _id=2", (level,))
+            with self.subTest(radio=radio, level=level), self.assertRaises(WigleImportError):
+                self.read(limits=Limits(batch_size=1))
+
     def test_invalid_scalar_values_rejected_without_echo(self):
         for table, key, bad in (("location", "level", -201), ("location", "level", "PRIVATE"),
                                 ("location", "lat", 91), ("location", "lon", float("inf")),
@@ -242,6 +273,7 @@ class BackupTests(unittest.TestCase):
         result = json.loads(stdout.getvalue())
         self.assertEqual(result["observations"], 3)
         self.assertEqual(result["externalObservations"], 1)
+        self.assertEqual(result["unknownSignalObservations"], 0)
         self.assertEqual(result["observationsByNetworkRadioCode"], {"W": 3})
         for token in ("02:00", "170000", "SYNTHETIC", str(self.path), "latitude"):
             self.assertNotIn(token, stdout.getvalue() + stderr.getvalue())
