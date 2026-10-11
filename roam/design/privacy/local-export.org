@@ -1,0 +1,70 @@
+:PROPERTIES:
+:ID: star-wpa-privacy-export-20261011
+:END:
+#+title: Local WiGLE privacy export
+#+description: Strict offline parsing, exclusion preview and exclusive sanitized analysis copies.
+#+status: IMPLEMENTED
+#+filetags: :rage:design:privacy:
+
+* Approval Table
+
+| Approval area | Required authority | State | Evidence required | Evidence reference |
+|---------------+--------------------+-------+-------------------+--------------------|
+| Local implementation, synthetic tests, issue and draft PR | Project owner | APPROVED | Explicit task | Delegated user request 2026-10-11 |
+| User deployment and private data publication | Project owner | NOT APPLICABLE | Scope exclusion | Task explicitly prohibits both |
+| Merge | Project owner | PENDING | Review and merge instruction | Draft PR only requested |
+
+* Verified Facts
+
+Inspected main 8ae3db65604f8d62e38d8004476dbb24b3025762. star_wpa/ingest.py ingest_wardrive and tests/fixtures/wardrive.json own the WarStar envelope. Existing read_bounded follows symlinks and is unsuitable unchanged. The coordinator verified WiGLE v1.6's 14 columns and historical 11-column and Quasar 9-column variants on 2026-10-11 against https://api.wigle.net/csvFormat-1_6.html and ObservationUploader.java at d75eca3e07ffbd4a7b598d5367bc6fd2d72ddafa in lost-rob0t/wigle-wifi-wardriving-starintel-. Preamble contains device metadata. No Quasar changes are needed.
+
+* Design
+
+Independent python -m star_wpa.privacy CLI/library; no adapter ingestion or custody pathway. Bounded strict UTF-8 CSV/JSON parsing, known exact headers and envelope keys, numeric/coordinate validation. Reduce inputs immediately to typed coordinate/radio/signal observations. Inclusive latitude/longitude boxes support antimeridian crossing; expand conservatively by meter buffers on a sphere, including polar coverage. Optional coarse coordinate rounding follows exclusion and repeats exclusion to avoid rounding back into a protected area. Output contains only latitude, longitude, radio, signal_dbm; sort and deduplicate retained tuples so source sequence/multiplicity is removed. Default coarse precision is 2 decimals. No metadata, original identifiers, names, timestamps, hashes, paths or exclusion geometry is serialized.
+
+Preview server binds 127.0.0.1 with exact Host/Origin validation and per-process request token, no CORS/logging/storage/outbound calls. Bundled offline coordinate plot and controls issue POSTs; preview must precede export, export uses the exact preview result. Source and destination are CLI-selected local paths; HTTP clients cannot choose paths. All path components are opened relative to directory descriptors using O_NOFOLLOW; export uses O_EXCL mode 0600. Explicitly describe retained-location disclosure and noncompatibility with WiGLE upload.
+
+* Evaluation Plan
+
+Synthetic tests: all supported inputs, embedded CSV quoting/newlines, malformed headers/counts/UTF-8/numbers/JSON; inclusive and buffered boundaries, antimeridian equivalents and poles; source-order and metadata removal; original byte preservation, file/parent symlinks and overwrite rejection; loopback Host/Origin/token/cache protections. Execute AGENTS.md full gates and installed packaging verification. No live user data or deployment.
+
+* Changelog
+
+| Date | Change | Author or actor | Evidence |
+|------+--------+-----------------+----------|
+| 2026-10-11 | Authorized design recorded | Codex | Delegation and inspected source |
+
+* IMPLEMENTED RAGE Execution Record
+:PROPERTIES:
+:STATUS_EVENT_ID: dba55b0d-aae8-420d-b203-e20cbcdf3b65
+:RECORDED_AT: 2026-10-11T02:23:39+00:00
+:END:
+
+** Summary
+Implement local-only strict WiGLE/WarStar reduction, offline exclusion preview and exclusive allowlisted sanitized CSV export for issue 14.
+
+** Files
+- star_wpa/privacy.py
+- star_wpa/privacy_ui.py
+- tests/test_privacy.py
+- tests/fixtures/privacy-wigle.csv
+- scripts/check-privacy-preview.py
+- docs/PRIVACY-EXPORT.md
+- README.md
+
+** Tests
+- 118 Python unit tests passed, including 25 synthetic privacy tests
+- Installed package/119 actor commands smoke passed
+- System Chromium synthetic preview, exclusion, precision, new-copy export, no external requests or storage, original preservation and mobile layout passed
+- Actor generation check and structure sync/check passed
+
+** Commits
+- None
+
+** Notes
+- Optional Playwright bundled-browser download was forbidden by CDN policy; existing /usr/bin/chromium completed the real browser proof.
+- Nix is unavailable locally; hosted native/Nix checks remain pending. No user captures, deployment or publication were used.
+
+* Final verification additions
+
+Issue: https://github.com/lost-rob0t/star-wpa/issues/14. scripts/check-installed-cli.py additionally proves the installed privacy module CLI and bundled UI import outside the source checkout; tests/test_smoke_cli.py covers the extended verifier. The temporary-wheel proof passed. Optional check-runtime-pin.py could not run without STARLANG_SOURCE; native/Nix validation remains delegated to hosted checks. No main merge or local-user deployment occurred.
