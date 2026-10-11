@@ -158,3 +158,5 @@ The effect ledger must be a regular file owned by the running user, with mode `0
 ## Local privacy export
 
 Review your own WiGLE CSV or WarStar observations in an offline loopback preview, exclude sensitive areas with buffers, and save a new sanitized analysis CSV without changing the original. See [privacy export instructions](docs/PRIVACY-EXPORT.md). Output strips identifiers, timestamps and capture order; retained locations can still reveal visits and spatial routes. It is not an anonymity guarantee or WiGLE upload format.
+
+The [local SQLite backup reader](docs/WIGLE-SQLITE.md) streams completed WiGLE backups with bounded validation and a counts-only CLI: `python -m star_wpa.wigle_sqlite`. It preserves observation fields and labels joined network summaries; inputs and derived results remain private. Compressed CSV is a separate, unsupported input for this reader.
