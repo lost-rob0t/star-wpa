@@ -116,7 +116,7 @@ RSSI(d) = A - 10 n log10(d / 1 metre)
 The output contains the one-metre reference signal `A`, path-loss exponent
 `n`, sample count, frequency, and `sqrt(sum(residual^2) / sample_count)` in dB.
 It rejects insufficient distance spread and exponents outside `(0, 10]`, except
-that a floating-point overage of at most 1e-12 at the upper bound is snapped to
+that a floating-point overage of at most 1e-11 at the upper bound is snapped to
 10. The intercept and residuals then use that same snapped slope. Larger
 overages are rejected; this numerical tolerance is not measurement uncertainty.
 Residual RMS describes this fit; it is not a confidence interval, a Monte Carlo

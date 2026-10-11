@@ -76,9 +76,10 @@ def fit_synthetic_calibration(request):
         slope = math.fsum((x - mean_x) * (y - mean_y) for x, y in points) / sxx
         exponent = -slope / 10
         # The inclusive upper bound can be exceeded by floating-point OLS
-        # roundoff. Snap only a 1e-12 absolute overage, then use that same slope
+        # roundoff (amplified near the accepted distance-spread floor). Snap only
+        # a 1e-11 absolute overage, then use that same slope
         # for the reported intercept and residuals. Larger overages still fail.
-        if 10 < exponent <= 10 + 1e-12:
+        if 10 < exponent <= 10 + 1e-11:
             exponent, slope = 10.0, -100.0
         if not 0 < exponent <= 10:
             raise ValueError('fit does not describe decreasing signal in the supported range')

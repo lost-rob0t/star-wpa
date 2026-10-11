@@ -129,10 +129,24 @@ class CalibrationTests(unittest.TestCase):
             self.assertLessEqual(result['pathLossExponent'], 10)
             self.assertAlmostEqual(result['referenceSignalDbm'], -1, places=10)
             self.assertLess(result['residualRmseDb'], 1e-10)
-        for exponent in (10.0 + 1e-11, 10.0 + 1e-9, 10.1):
+        for exponent in (10.0 + 2e-11, 10.0 + 1e-9, 10.1):
             signals = [-1 - 10 * exponent * math.log10(d) for d in distances]
             with self.subTest(exponent=exponent), self.assertRaises(ValueError):
                 fit_synthetic_calibration(fixture(signals, distances))
+
+    def test_inclusive_exponent_boundary_at_offset_and_narrow_distance_spans(self):
+        # Valid, above-floor log-distance spreads found by a seeded boundary
+        # sweep. Rounded RSSI/log-distance inputs amplify OLS error past 1e-12.
+        cases = ((2.620709480244166, 0.0025993126716810926, 100),
+                 (4.479059460912886, 0.001249338400846493, 447.9059460912886))
+        for origin, step, intercept in cases:
+            distances = [10**(origin + j * step) for j in range(3)]
+            signals = [intercept - 100 * math.log10(d) for d in distances]
+            with self.subTest(origin=origin):
+                fit = fit_synthetic_calibration(fixture(signals, distances))['fits'][0]
+                self.assertEqual(fit['pathLossExponent'], 10)
+                self.assertAlmostEqual(fit['referenceSignalDbm'], intercept, places=10)
+                self.assertLess(fit['residualRmseDb'], 1e-10)
 
     def test_documented_synthetic_fixture_recovers_known_model(self):
         example = Path(__file__).resolve().parents[1] / 'examples/simulation-calibration-synthetic.json'
