@@ -19,6 +19,8 @@ jobs:
         run: python3 -m pip install -e . "setuptools>=68" wheel
       - name: Compile scripts
         run: python3 -m py_compile scripts/*.py
+      - name: Reject tracked private geography and captures
+        run: python3 scripts/check-private-inputs.py
       - name: Unit tests
         run: python3 -m unittest discover -s tests -p 'test_*.py' -v
       - name: Check generated actor and shell-command coverage

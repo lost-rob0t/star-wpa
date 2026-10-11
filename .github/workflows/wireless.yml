@@ -12,6 +12,8 @@ jobs:
       - uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31
       - name: Flake packages, native actors and contracts
         run: nix flake check -L
+      - name: Optional symbolic simulation runtime
+        run: nix develop .#simulation --command swipl --version
       - name: Flake application smoke checks
         run: |
           nix run . -- tool-wifiphisher --request tests/fixtures/tool-discovery.json > /tmp/star-wpa-adapter.json
