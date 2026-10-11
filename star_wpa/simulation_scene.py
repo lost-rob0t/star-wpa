@@ -39,6 +39,7 @@ def _https(value):
     try:
         parsed = urlsplit(value)
         valid = (not any(char.isspace() or ord(char) < 32 or ord(char) == 127 for char in value)
+                 and '\\' not in value and '%' not in parsed.netloc
                  and parsed.scheme == 'https' and parsed.hostname
                  and parsed.username is None and parsed.password is None
                  and not parsed.query and not parsed.fragment
@@ -46,7 +47,7 @@ def _https(value):
     except ValueError:
         valid = False
     if not valid:
-        raise ValueError('source URL must be valid HTTPS without credentials, whitespace, query, or fragment')
+        raise ValueError('source URL has unsupported HTTPS syntax or credentials')
 
 
 def _cross(a, b, c):

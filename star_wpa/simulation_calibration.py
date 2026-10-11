@@ -75,6 +75,11 @@ def fit_synthetic_calibration(request):
             raise ValueError('distance range is too narrow for a stable fit')
         slope = math.fsum((x - mean_x) * (y - mean_y) for x, y in points) / sxx
         exponent = -slope / 10
+        # The inclusive upper bound can be exceeded by floating-point OLS
+        # roundoff. Snap only a 1e-12 absolute overage, then use that same slope
+        # for the reported intercept and residuals. Larger overages still fail.
+        if 10 < exponent <= 10 + 1e-12:
+            exponent, slope = 10.0, -100.0
         if not 0 < exponent <= 10:
             raise ValueError('fit does not describe decreasing signal in the supported range')
         intercept = mean_y - slope * mean_x

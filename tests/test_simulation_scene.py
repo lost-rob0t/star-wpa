@@ -126,7 +126,8 @@ class SceneTests(unittest.TestCase):
                        {'verification':'verified'}, {'sourceUrl':'https://example.org/data?token=private'},
                        {'sourceUrl':'https://example.org:bad/data'}, {'sourceUrl':'https://example.org:99999/data'},
                        {'sourceUrl':'https://@example.org/data'}, {'sourceUrl':'https://exam ple.org/data'},
-                       {'sourceUrl':'https://example.org/\nprivate'}, {'sourceUrl':'https://[invalid/data'}):
+                       {'sourceUrl':'https://example.org/\nprivate'}, {'sourceUrl':'https://[invalid/data'},
+                       {'sourceUrl':'https://example.org\\bad/path'}, {'sourceUrl':'https://%zz.invalid/path'}):
             with self.subTest(change=change), self.assertRaises(ValueError):
                 adapt_open_geometry(projected, dict(provenance, **change), scene_type='field', seed=7)
         with self.assertRaises(ValueError):

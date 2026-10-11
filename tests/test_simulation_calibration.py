@@ -1,6 +1,7 @@
 """Analytic fits and privacy invariants using only original synthetic rows."""
 import copy
 import json
+import math
 import unittest
 from fractions import Fraction
 from pathlib import Path
@@ -118,6 +119,20 @@ class CalibrationTests(unittest.TestCase):
                         fixture(signals=(-40,-40,-40)), fixture(signals=(-80,-60,-40))):
             with self.subTest(request=request), self.assertRaises(ValueError):
                 fit_synthetic_calibration(request)
+
+    def test_inclusive_exponent_limit_tolerates_only_numerical_roundoff(self):
+        distances = (1, 2, 3)
+        for exponent in (10.0, 10.0 - 1e-8):
+            signals = [-1 - 10 * exponent * math.log10(d) for d in distances]
+            result = fit_synthetic_calibration(fixture(signals, distances))['fits'][0]
+            self.assertAlmostEqual(result['pathLossExponent'], exponent, places=10)
+            self.assertLessEqual(result['pathLossExponent'], 10)
+            self.assertAlmostEqual(result['referenceSignalDbm'], -1, places=10)
+            self.assertLess(result['residualRmseDb'], 1e-10)
+        for exponent in (10.0 + 1e-11, 10.0 + 1e-9, 10.1):
+            signals = [-1 - 10 * exponent * math.log10(d) for d in distances]
+            with self.subTest(exponent=exponent), self.assertRaises(ValueError):
+                fit_synthetic_calibration(fixture(signals, distances))
 
     def test_documented_synthetic_fixture_recovers_known_model(self):
         example = Path(__file__).resolve().parents[1] / 'examples/simulation-calibration-synthetic.json'

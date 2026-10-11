@@ -69,8 +69,9 @@ upstream provider's already projected local-metre geometry:
 - `coordinateTransform` describes the source CRS, chosen local projection,
   origin, transform/tool version, and accuracy limitations. This first boundary
   requires a nonempty declaration, not a machine-verifiable projection record.
-- Source and license URLs must use valid HTTPS without credentials, whitespace,
-  query strings, or fragments. Nothing is fetched. Preserve a stable dataset landing URL;
+- Source and license URLs must use HTTPS without credentials, whitespace,
+  escaped authority text, backslashes, query strings, or fragments. The syntax
+  checks do not verify a working URL or a source. Nothing is fetched. Preserve a stable dataset landing URL;
   authenticated downloads and request details stay outside this contract.
 
 The result always records `kind: "public-open"` and
@@ -114,7 +115,10 @@ RSSI(d) = A - 10 n log10(d / 1 metre)
 
 The output contains the one-metre reference signal `A`, path-loss exponent
 `n`, sample count, frequency, and `sqrt(sum(residual^2) / sample_count)` in dB.
-It rejects insufficient distance spread and exponents outside `(0, 10]`.
+It rejects insufficient distance spread and exponents outside `(0, 10]`, except
+that a floating-point overage of at most 1e-12 at the upper bound is snapped to
+10. The intercept and residuals then use that same snapped slope. Larger
+overages are rejected; this numerical tolerance is not measurement uncertainty.
 Residual RMS describes this fit; it is not a confidence interval, a Monte Carlo
 uncertainty estimate, or evidence of real radio calibration. Rows may be
 correlated, and repeated rows are not independent measurements. No claims are
