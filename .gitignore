@@ -17,3 +17,10 @@ build/
 dist/
 *.sqlite*
 .venv/
+
+# Operator geography and raw captures stay outside version control.
+*.[kK][mM][lL]
+*.[kK][mM][zZ]
+*.[pP][cC][aA][pP]
+*.[pP][cC][aA][pP][nN][gG]
+*.[cC][aA][pP]

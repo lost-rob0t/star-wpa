@@ -188,6 +188,10 @@
                STAR_WPA_NIX_TOOL_MANIFEST = nixBindings;
                shellHook = ''export CL_SOURCE_REGISTRY="$PWD//:${star-lang}//"'';
              };
+             # Prolog is opt-in: simulation has no hardware/tool-bundle dependency.
+             simulationShell = pkgs.mkShell {
+               packages = [ installedPython pkgs.swi-prolog ];
+             };
              formatter = pkgs.nixfmt; };
     in {
       packages = eachSystem (system: let p = make system; in {
@@ -208,7 +212,11 @@
         native = { type = "app"; program = "${p.native}/bin/star-wpa-native"; };
       });
       checks = eachSystem (system: let p = make system; in { adapters = p.adapters; native = p.checks; runtime = p.runtimeChecks; });
-      devShells = eachSystem (system: { default = (make system).shell; wireless = (make system).wirelessShell; });
+      devShells = eachSystem (system: {
+        default = (make system).shell;
+        wireless = (make system).wirelessShell;
+        simulation = (make system).simulationShell;
+      });
       formatter = eachSystem (system: (make system).formatter);
     };
 }
