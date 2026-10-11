@@ -370,7 +370,8 @@ class SmokeCliTests(unittest.TestCase):
                 if 'import importlib.metadata' in code:
                     stdout = metadata
             elif '--help' in argv:
-                stdout = 'usage: ' + executable.name + ' --request REQUEST\n'
+                stdout = ('sanitized analysis CSV' if 'star_wpa.privacy' in argv else
+                          'usage: ' + executable.name + ' --request REQUEST\n')
             elif '--request' in argv:
                 request = Path(argv[argv.index('--request') + 1])
                 if request.name == 'invalid.json':
@@ -402,13 +403,15 @@ class SmokeCliTests(unittest.TestCase):
         self.assertEqual(len(wrapped_paths), 1)
         self.assertEqual(self.binary_snapshot(), before)
         self.assertFalse((self.binaries / '.sa-listener-wrapped').exists())
-        self.assertEqual({Path(argv[0]).name for argv in commands if '--help' in argv},
+        self.assertEqual({Path(argv[0]).name for argv in commands if '--help' in argv and '-m' not in argv},
                          set(self.scripts))
         for actor in ('listener', 'gpsd', 'kismet', 'wardrive', 'trilateration', 'deauth'):
             self.assertTrue(any(Path(argv[0]).name == 'sa-' + actor and '--request' in argv
                                 for argv in commands), actor)
         python_commands = [argv for argv in commands if argv[0] == '/offline/python']
-        self.assertEqual(len(python_commands), 3)
+        self.assertEqual(len(python_commands), 5)
+        self.assertTrue(any('star_wpa.privacy' in argv for argv in python_commands))
+        self.assertTrue(any('privacy_ui' in ' '.join(argv) for argv in python_commands))
         for argv in python_commands:
             self.assertNotIn('-I', argv)
         self.assert_user_site_imports(python_commands, unrelated)

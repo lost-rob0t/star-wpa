@@ -154,3 +154,7 @@ See [migration ownership](docs/MIGRATION.md) and the [implementation evidence](r
 HTTP collection and CouchDB requests reject redirects to prevent forwarding credentials. Configure the final endpoint URL directly. Existing credentialed Kismet deployments must add `"kismetTokenUrls": ["https://kismet.example/devices.json"]` to their local policy.
 
 The effect ledger must be a regular file owned by the running user, with mode `0600` and one hard link; symlinks are rejected. Keep its parent directory private and trusted. Existing ledgers with shared permissions must be corrected locally before execution. Input JSON, manifests and stdin are read as bounded regular files; FIFO/device inputs are rejected. Aircrack/deauth now have the same 1 MiB per-stream limit and process-group cleanup as generic tool actors. These controls do not sandbox installed tools: executable dependencies, PATH, working directories and policy remain operator-trusted.
+
+## Local privacy export
+
+Review your own WiGLE CSV or WarStar observations in an offline loopback preview, exclude sensitive areas with buffers, and save a new sanitized analysis CSV without changing the original. See [privacy export instructions](docs/PRIVACY-EXPORT.md). Output strips identifiers, timestamps and capture order; retained locations can still reveal visits and spatial routes. It is not an anonymity guarantee or WiGLE upload format.

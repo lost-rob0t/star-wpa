@@ -179,6 +179,11 @@ def verify_installation(python, binaries, environment, unrelated, expected_scrip
     module = run([python, '-m', 'star_wpa', 'listener', '--request', unrelated / 'request.json'],
                  cwd=unrelated, env=environment)
     require(json.loads(module.stdout) == bundles[2], 'Installed python -m star_wpa compatibility failure')
+    privacy = run([python, '-m', 'star_wpa.privacy', '--help'], cwd=unrelated, env=environment)
+    require('sanitized analysis CSV' in privacy.stdout, 'Installed privacy CLI is unavailable')
+    run([python, '-c', 'from star_wpa.privacy_ui import PAGE; assert "Local privacy export" in PAGE'],
+        cwd=unrelated, env=environment)
+    print('PASS: installed privacy CLI and bundled offline UI are available outside the checkout', flush=True)
     progress('offline-ingestion', 'passed')
     print('PASS: five offline core actors emit schema-valid batches; legacy CLI, module, and wrapped script remain compatible', flush=True)
 
