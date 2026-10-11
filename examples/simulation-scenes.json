@@ -1,0 +1,6 @@
+[
+  {"scene_type":"brick-residential","seed":104,"width_meters":240,"height_meters":180,"building_count":12},
+  {"scene_type":"supermarket","seed":104,"width_meters":120,"height_meters":100,"building_count":1},
+  {"scene_type":"field","seed":104,"width_meters":500,"height_meters":300,"building_count":0},
+  {"scene_type":"highway","seed":104,"width_meters":1000,"height_meters":80,"building_count":0}
+]

@@ -1,0 +1,14 @@
+{
+  "format":"star-wpa-synthetic-calibration-v1",
+  "provenance":"synthetic",
+  "observations":[
+    {"id":1,"address":"02:00:00:00:00:01","radio":"WIFI","frequency":2412,"level":-40},
+    {"id":2,"address":"02:00:00:00:00:01","radio":"WIFI","frequency":2412,"level":-60},
+    {"id":3,"address":"02:00:00:00:00:01","radio":"WIFI","frequency":2412,"level":-80}
+  ],
+  "knownDistancesMeters":[
+    {"id":1,"distanceMeters":1},
+    {"id":2,"distanceMeters":10},
+    {"id":3,"distanceMeters":100}
+  ]
+}
